@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phishing Detector</title>
+    <style>
+      body {
+        width: 320px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f9f9f9;
+        text-align: center;
+      }
+      h2 {
+        margin-top: 0;
+        color: #333;
+      }
+      .status-box {
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+      .safe {
+        background-color: #28a745;
+      }
+      .warning {
+        background-color: #dc3545;
+      }
+      .unknown {
+        background-color: #6c757d;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #result-details {
+        margin-top: 15px;
+        font-size: 0.9em;
+        color: #555;
+        text-align: left;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+      .loader {
+        display: none;
+        margin: 10px auto;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Phishing Detector</h2>
+
+    <div id="status-box" class="status-box unknown">Ready to Scan</div>
+
+    <div class="loader" id="loader"></div>
+
+    <button id="scan-btn">Scan This Page</button>
+
+    <div id="result-details"></div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

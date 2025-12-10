@@ -1,0 +1,1 @@
+['url_length', 'hostname_length', 'path_length', 'hostname_ratio', 'path_ratio', 'num_dots', 'num_slashes', 'num_hyphens', 'num_special_char', 'num_at', 'num_percent', 'num_equal', 'digit_ratio', 'letter_ratio', 'contains_ip', 'uses_https', 'subdomain_depth', 'tld_length', 'suspicious_keyword_flag', 'url_entropy', 'domain_entropy', 'path_entropy']

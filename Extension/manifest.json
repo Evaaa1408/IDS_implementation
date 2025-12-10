@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Phishing Detector Agent",
+  "version": "1.0",
+  "description": "Detects phishing websites using a local Ensemble ML model.",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "scripting",
+    "notifications"
+  ],
+  "host_permissions": [
+    "http://localhost:5000/*",
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Check Phishing Status"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}

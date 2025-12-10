@@ -1,0 +1,1 @@
+[2025-12-10 05:45:04] MALICIOUS DETECTED | URL: https://www.youtube.com/ | Confidence: 0.9996

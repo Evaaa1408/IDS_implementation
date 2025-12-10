@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection | Admin Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">🛡️ SecureEye Admin</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div id="system-status">
+                    <span class="status-badge status-idle" id="status-light"></span>
+                    <span id="status-text">System Idle</span>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="theme-icon">☀️</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <!-- Training Controls -->
+            <div class="card">
+                <h2>🧠 Neural Training Control</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Retrain Frequency</label>
+                        <select id="frequency-select">
+                            <option value="manual">Manual</option>
+                            <option value="6d">Every 6 Days</option>
+                            <option value="14d">Every 2 Weeks</option>
+                            <option value="30d">Every Month</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: flex-end;">
+                        <button class="btn-primary" onclick="triggerRetrain()" id="train-btn">
+                            🔥 Start Retraining
+                        </button>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                    Last trained: <span id="last-trained-date">2025-12-10 05:00</span>
+                </p>
+            </div>
+
+            <!-- Stats -->
+            <div class="card" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                <h3 style="color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase;">Pending Threats</h3>
+                <div style="font-size: 3rem; font-weight: 700; color: var(--accent-color);" id="pending-count">0</div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">Requiring Review</div>
+            </div>
+        </div>
+
+        <!-- Malicious Log Table -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>🚨 Malicious Traffic Log</h2>
+                <button class="theme-toggle" onclick="fetchLogs()">🔄 Refresh</button>
+            </div>
+            
+            <div class="table-container">
+                <table id="log-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Detected URL</th>
+                            <th>Confidence</th>
+                            <th>Prediction</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-body">
+                        <!-- Data will be injected here -->
+                    </tbody>
+                </table>
+                <div id="empty-state" style="text-align: center; padding: 2rem; color: var(--text-secondary); display: none;">
+                    No pending threats found.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/dashboard.js"></script>
+</body>
+</html>

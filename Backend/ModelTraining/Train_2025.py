@@ -1,3 +1,4 @@
+#Train_2025.py
 import pandas as pd
 import numpy as np
 import joblib
@@ -83,7 +84,7 @@ print("\n📊 Splitting data into train/test sets...")
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
-    test_size=0.2,        # 20% for testing
+    test_size=0.2,       
     random_state=42,     
     stratify=y            
 )

@@ -1,3 +1,4 @@
+#DataCollector.py
 import os
 import pandas as pd
 import datetime
@@ -12,7 +13,7 @@ class DataCollector:
             self.base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../Dataset'))
         
         self.log_file = os.path.join(self.base_dir, "self_learning_data.csv")
-        self.malicious_log_file = os.path.join(self.base_dir, "malicious_log.txt") # User Request
+        self.malicious_log_file = os.path.join(self.base_dir, "malicious_log.txt") 
         self.html_storage_dir = os.path.join(self.base_dir, "html_logs")
         
         # Ensure directories exist

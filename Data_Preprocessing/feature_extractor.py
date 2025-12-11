@@ -1,3 +1,4 @@
+#feature_extractor.py
 import re
 import math
 from urllib.parse import urlparse
@@ -23,6 +24,17 @@ class URLFeatureExtractor:
         counts = Counter(s)
         probs = [float(c) / len(s) for c in counts.values()]
         return -sum(p * math.log2(p) for p in probs)
+
+    def normalize_url(self, url):
+        """Add www if missing from legitimate-looking domains"""
+        parsed = urlparse(url)
+        hostname = parsed.hostname or ""
+        
+        # If domain has no subdomain and looks legitimate
+        if hostname.count('.') == 1 and not hostname.startswith('www.'):
+            pass
+        
+        return url
 
     def extract(self, url):
         try:

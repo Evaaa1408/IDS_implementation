@@ -1,4 +1,4 @@
-// Content Script
+// Content.js
 // Listens for messages from background.js to show warnings
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

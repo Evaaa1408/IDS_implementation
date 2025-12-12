@@ -1,0 +1,95 @@
+================================================================================
+ MODEL 2025 - TRAINING REPORT
+================================================================================
+
+Generated: 2025-12-13 06:23:43
+
+================================================================================
+
+📊 DATASET INFORMATION
+--------------------------------------------------------------------------------
+Total Samples:          336,748
+Training Samples:       269,398
+Test Samples:           67,350
+Number of Features:     32
+
+Label Distribution:
+  Legitimate:           160,943 (47.8%)
+  Phishing:             175,805 (52.2%)
+
+================================================================================
+
+🎯 MODEL PERFORMANCE
+--------------------------------------------------------------------------------
+Test Accuracy:          0.9940 (99.40%)
+Train Accuracy:         0.9964 (99.64%)
+CV Accuracy:            0.9949 ± 0.0002
+Overfitting Gap:        0.0023
+  ✅ Excellent - Minimal overfitting
+
+================================================================================
+
+📋 CONFUSION MATRIX
+--------------------------------------------------------------------------------
+True Negatives (Legit → Legit):      32,135
+False Positives (Legit → Phishing):  54
+False Negatives (Phishing → Legit):  349
+True Positives (Phishing → Phishing): 34,812
+
+False Positive Rate:    0.0017 (0.17%)
+False Negative Rate:    0.0099 (0.99%)
+
+================================================================================
+
+🏆 TOP 20 MOST IMPORTANT FEATURES
+--------------------------------------------------------------------------------
+path_length                    0.466012
+num_slashes                    0.443780
+uses_https                     0.076830
+SuspiciousTLD                  0.003407
+hostname_ratio                 0.002380
+path_ratio                     0.001970
+num_dots                       0.001378
+url_length                     0.000967
+digit_ratio                    0.000628
+subdomain_depth                0.000524
+CharacterSubstitutions         0.000315
+url_entropy                    0.000228
+tld_length                     0.000205
+ExcessiveHyphens               0.000187
+letter_ratio                   0.000178
+num_hyphens                    0.000138
+NumberLetterMixing             0.000136
+suspicious_keyword_flag        0.000135
+LowVowelRatio                  0.000125
+num_special_char               0.000123
+
+================================================================================
+
+⚙️  HYPERPARAMETERS
+--------------------------------------------------------------------------------
+n_estimators              228
+learning_rate             0.1957800274548136
+max_depth                 10
+subsample                 0.9625094106004689
+colsample_bytree          0.8413509119314768
+min_child_weight          2
+gamma                     0.21159550847993433
+reg_lambda                4.782781199860142
+reg_alpha                 0.006513309784073995
+
+================================================================================
+
+📌 LABEL ENCODING
+--------------------------------------------------------------------------------
+Class 0 = Legitimate (Safe websites)
+Class 1 = Phishing (Malicious websites)
+
+When predict_proba() returns [0.9, 0.1]:
+  - 90% probability of Legitimate (index 0)
+  - 10% probability of Phishing (index 1)
+
+================================================================================
+
+✅ TRAINING COMPLETED SUCCESSFULLY
+================================================================================

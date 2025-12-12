@@ -43,7 +43,7 @@ except Exception as e:
 test_cases = [
     {
         "name": "Google",
-        "url": "https://www.google.com",
+        "url": "https://www.g0ogl@s.com",
         "html": """
         <html>
         <head>
@@ -64,7 +64,7 @@ test_cases = [
     },
     {
         "name": "YouTube",
-        "url": "https://www.youtube.com",
+        "url": "https://www.youutube.com",
         "html": """
         <html>
         <head>
@@ -83,7 +83,7 @@ test_cases = [
     },
     {
         "name": "Instagram",
-        "url": "https://www.instagram.com",
+        "url": "https://www.instagrambonus.com",
         "html": """
         <html>
         <head>

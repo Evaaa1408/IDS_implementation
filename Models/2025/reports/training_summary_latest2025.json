@@ -1,0 +1,39 @@
+{
+    "training_date": "2025-12-13 06:23:43",
+    "model_type": "XGBoost Classifier",
+    "label_encoding": "0=Legitimate, 1=Phishing",
+    "dataset": {
+        "total_samples": 336748,
+        "training_samples": 269398,
+        "test_samples": 67350,
+        "num_features": 32,
+        "label_distribution": {
+            "Legitimate": 160943,
+            "Phishing": 175805
+        }
+    },
+    "hyperparameters": {
+        "n_estimators": 228,
+        "learning_rate": 0.1957800274548136,
+        "max_depth": 10,
+        "subsample": 0.9625094106004689,
+        "colsample_bytree": 0.8413509119314768,
+        "min_child_weight": 2,
+        "gamma": 0.21159550847993433,
+        "reg_lambda": 4.782781199860142,
+        "reg_alpha": 0.006513309784073995
+    },
+    "performance": {
+        "test_accuracy": 0.9940163325909428,
+        "train_accuracy": 0.9963511236163595,
+        "cv_accuracy_mean": 0.9948960274385344,
+        "cv_accuracy_std": 0.00018485442681391397,
+        "overfitting_gap": 0.0023347910254166715
+    },
+    "confusion_matrix": {
+        "true_negatives": 32135,
+        "false_positives": 54,
+        "false_negatives": 349,
+        "true_positives": 34812
+    }
+}

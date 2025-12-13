@@ -1,4 +1,4 @@
-#Preprocess_2023.py
+#Preprocess_2023_FIXED.py
 import pandas as pd
 
 print("\n========================================")
@@ -41,20 +41,67 @@ if len(null_cols) > 0:
 if "label" not in df.columns:
     raise ValueError("❌ ERROR: 'label' column not found in dataset!")
 
+# ---------------------------------------------------
+# CRITICAL FIX: Check CURRENT label format
+# ---------------------------------------------------
+print("\n🔍 Checking label format...")
+print(f"   Label dtype: {df['label'].dtype}")
+print(f"   Unique values: {df['label'].unique()}")
+print(f"   Value counts:")
+print(df['label'].value_counts())
+
+# Convert to numeric if needed
+if df["label"].dtype == 'object':
+    print("\n🔄 Converting string labels to numeric...")
+    
+    # Check current format
+    sample_labels = df['label'].unique()
+    print(f"   Current labels: {sample_labels}")
+    
+    # Map to standard format: 0=Legitimate, 1=Phishing
+    label_mapping = {
+        'Legitimate': 0,
+        'legitimate': 0,
+        'Safe': 0,
+        'safe': 0,
+        'Phishing': 1,
+        'phishing': 1,
+        'Malicious': 1,
+        'malicious': 1
+    }
+    
+    df["label"] = df["label"].map(label_mapping)
+    
+    if df["label"].isna().any():
+        unmapped = df[df["label"].isna()]['label'].unique()
+        print(f"   ⚠️  Unmapped labels found: {unmapped}")
+        print(f"   Dropping {df['label'].isna().sum()} rows...")
+        df = df.dropna(subset=['label'])
+
+# Convert to integer
 df["label"] = pd.to_numeric(df["label"], errors="coerce")
+
 if df["label"].isna().any():
-    raise ValueError("❌ ERROR: Invalid label values found!")
+    print(f"⚠️  WARNING: {df['label'].isna().sum()} invalid labels found!")
+    df = df.dropna(subset=['label'])
+
+df["label"] = df["label"].astype(int)
 
 # ---------------------------------------------------
-# [Standardization] Flip labels to match Model 2025
-# Current (2023): 0 = Phishing, 1 = Legitimate
-# Target (2025):  1 = Phishing, 0 = Legitimate
-# Action: Invert (1 - label)
+# REMOVED: Label inversion (was causing the bug)
 # ---------------------------------------------------
-print("\n🔄 Standardizing labels to match 2025 format (1=Phishing)...")
-print("   Before: 0=Phishing, 1=Legitimate")
-df["label"] = 1 - df["label"]
-print("   After:  1=Phishing, 0=Legitimate")
+# OLD CODE (REMOVED):
+# df["label"] = 1 - df["label"]  ← This was inverting labels!
+
+# ---------------------------------------------------
+# Verify final labels
+# ---------------------------------------------------
+print("\n✅ Final label format:")
+print(f"   0 = Legitimate: {(df['label'] == 0).sum()} samples")
+print(f"   1 = Phishing:   {(df['label'] == 1).sum()} samples")
+
+if not set(df['label'].unique()).issubset({0, 1}):
+    raise ValueError("❌ ERROR: Labels must be 0 or 1!")
 
 # ---------------------------------------------------
 # 6) Detect URL column
@@ -96,7 +143,7 @@ print(f"🔍 Duplicate rows after cleaning: {row_dupes_after}")
 
 minimal_drop_cols = [
     # dataset metadata
-    "FILENAME", "filename"
+    "FILENAME", "filename",
     # direct leakage label-like scores
     "LikelinessIndex",
     "WAPLegitimate",
@@ -113,12 +160,12 @@ minimal_drop_cols = [
 # keep only the columns that exist before dropping (safe)
 to_drop = [c for c in minimal_drop_cols if c in df.columns]
 if to_drop:
-    print(f"\n Dropping {len(to_drop)} high-leakage / page-derived columns:")
+    print(f"\n🗑 Dropping {len(to_drop)} high-leakage / page-derived columns:")
     for c in to_drop:
         print(f"   - {c}")
     df = df.drop(columns=to_drop, errors="ignore")
 else:
-    print("\n No high-leakage columns found to drop.")
+    print("\n✅ No high-leakage columns found to drop.")
 
 # ---------------------------------------------------
 # 9) Shuffle dataset (remove ordering bias)
@@ -134,4 +181,5 @@ print("\n========================================")
 print(" ✅ CLEANING COMPLETE")
 print("========================================")
 print("New shape:", df.shape)
+print(f"Final labels: 0={( df['label'] == 0).sum()}, 1={(df['label'] == 1).sum()}")
 print("💾 Cleaned dataset successfully!\n")

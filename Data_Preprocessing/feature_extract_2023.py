@@ -128,7 +128,7 @@ class ContentFeatureExtractor:
             features['NoOfSelfRef'] = self_ref
             features['NoOfEmptyRef'] = empty_ref
             features['NoOfExternalRef'] = ext_ref
-            
+
         except Exception as e:
             # print(f"Error parsing HTML: {e}")
             pass

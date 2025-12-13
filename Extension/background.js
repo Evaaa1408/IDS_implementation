@@ -1,3 +1,27 @@
+// background.js - FIXED VERSION
+const API_ENDPOINT = "http://localhost:5000/predict";
+
+// Track which tabs have been checked to avoid duplicate requests
+const checkedTabs = new Set();
+
+// ========================================================
+// SINGLE tab update listener with proper timing
+// ========================================================
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    // Only check when page is completely loaded
+    if (changeInfo.status === 'complete' && tab.url && tab.url.startsWith('http')) {
+        // Avoid duplicate checks
+        if (!checkedTabs.has(tabId)) {
+            checkedTabs.add(tabId);
+            
+            // Wait 1500ms to ensure HTML is fully rendered
+            setTimeout(() => {
+                checkUrl(tab.url, tabId);
+            }, 1500);
+        }
+    }
+});
+
 // Clean up checked tabs when they're closed
 chrome.tabs.onRemoved.addListener((tabId) => {
     checkedTabs.delete(tabId);
@@ -5,22 +29,23 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 
 async function checkUrl(url, tabId) {
     try {
-        console.log("📡 Capturing HTML for:", url);
+        console.log("📡 Scanning:", url);
         
-        // ========================================================
-        // METHOD 1: Try to capture HTML from content script
-        // ========================================================
+        // Wait additional time for dynamic content
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         let htmlContent = null;
+        let htmlCaptured = false;
         
         try {
-            // First, check if we can access this tab
             const tab = await chrome.tabs.get(tabId);
             
+            // Check if we can access this tab
             if (!tab.url.startsWith('chrome://') && 
                 !tab.url.startsWith('chrome-extension://') &&
                 !tab.url.startsWith('edge://')) {
                 
-                // Execute script to get HTML
+                // Execute script with error handling
                 const results = await chrome.scripting.executeScript({
                     target: { tabId: tabId },
                     func: () => {
@@ -34,102 +59,172 @@ async function checkUrl(url, tabId) {
                 
                 if (results && results[0] && results[0].result) {
                     htmlContent = results[0].result;
-                    console.log("✅ HTML captured successfully:", htmlContent.length, "characters");
+                    htmlCaptured = true;
+                    console.log("✅ HTML captured:", htmlContent.length, "bytes");
                 } else {
-                    console.warn("⚠️ HTML capture returned empty result");
+                    console.error("❌ HTML capture failed - no result");
                 }
-            } else {
-                console.warn("⚠️ Cannot capture HTML from system page");
             }
         } catch (err) {
-            console.error("❌ HTML capture failed:", err.message);
-            console.log("🔄 Continuing with URL-only mode...");
+            console.error("❌ HTML capture exception:", err.message);
         }
 
+        // Log if HTML capture failed
+        if (!htmlCaptured) {
+            console.error("🚨 WARNING: Proceeding without HTML - Model 2023 will be skipped!");
+        }
+
+       // ========================================================
+        // Send to API
         // ========================================================
-        // Send request to backend
-        // ========================================================
-        console.log("📤 Sending to API:", {
-            url: url,
-            hasHTML: htmlContent !== null,
-            htmlLength: htmlContent ? htmlContent.length : 0
-        });
+        console.log("📤 Sending to API...");
+        console.log("   URL:", url);
+        console.log("   HTML:", htmlCaptured ? `${htmlContent.length} bytes` : "Not captured");
         
         const response = await fetch(API_ENDPOINT, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
                 url: url,
-                html_content: htmlContent
+                html_content: htmlContent,
+                html_captured: htmlCaptured
             })
         });
 
         if (!response.ok) {
             console.error("❌ API Error:", response.status, response.statusText);
-            // Show error badge
-            chrome.action.setBadgeText({ text: "ERR", tabId: tabId });
-            chrome.action.setBadgeBackgroundColor({ color: "#ff9800", tabId: tabId });
+            showErrorBadge(tabId);
             return;
         }
 
         const data = await response.json();
-        console.log("📥 API Response:", data);
+        
+        // ========================================================
+        // Log API Response
+        // ========================================================
+        console.log("📥 API Response:");
+        console.log("   Risk Level:", data.risk_level);
+        console.log("   Final Risk:", data.final_risk_pct + "%");
+        console.log("   URL Risk:", (data.url_prob * 100).toFixed(1) + "%");
+        console.log("   Content Risk:", (data.content_prob * 100).toFixed(1) + "%");
+        console.log("   Color:", data.color);
+        console.log("   Whitelisted:", data.whitelisted);
+        console.log("   Is Phishing:", data.is_phishing);
 
         // ========================================================
-        // Handle result
+        // Handle result based on risk level
         // ========================================================
-        if (data.is_phishing) {
-            console.log("🚨 PHISHING DETECTED!");
-            handlePhishingDetection(tabId, data);
-        } else {
-            console.log("✅ Site is SAFE");
-            chrome.action.setBadgeText({ text: "SAFE", tabId: tabId });
-            chrome.action.setBadgeBackgroundColor({ color: "#28a745", tabId: tabId });
-        }
+        handleResult(tabId, data);
 
     } catch (error) {
         console.error("❌ Connection Failed:", error);
-        // Show error badge
-        chrome.action.setBadgeText({ text: "ERR", tabId: tabId });
-        chrome.action.setBadgeBackgroundColor({ color: "#ff9800", tabId: tabId });
+        showErrorBadge(tabId);
     }
 }
 
-function handlePhishingDetection(tabId, data) {
-    // 1. Set Red Badge
-    chrome.action.setBadgeText({ text: "SUS", tabId: tabId });
-    chrome.action.setBadgeBackgroundColor({ color: "#d9534f", tabId: tabId });
+function handleResult(tabId, data) {
+    const riskLevel = data.risk_level || 'UNKNOWN';
+    const color = data.color || 'gray';
+    const riskPct = data.final_risk_pct || 0;
+    
+    console.log("🎯 Handling result:", riskLevel, "(" + riskPct.toFixed(1) + "%)");
+    
+    // ========================================================
+    // Set badge based on risk level
+    // ========================================================
+    if (riskLevel === 'VERY SUSPICIOUS' || riskPct > 75) {
+        // RED - High risk
+        chrome.action.setBadgeText({ text: "RISK", tabId: tabId });
+        chrome.action.setBadgeBackgroundColor({ color: "#d9534f", tabId: tabId });
+        
+        console.log("🔴 BLOCKING page");
+        showBlockingOverlay(tabId, data);
+        
+    } else if (riskLevel === 'POSSIBLY MALICIOUS' || riskPct > 40) {
+        // YELLOW - Medium risk
+        chrome.action.setBadgeText({ text: "WARN", tabId: tabId });
+        chrome.action.setBadgeBackgroundColor({ color: "#ff9800", tabId: tabId });
+        
+        console.log("🟡 WARNING for page");
+        showWarningOverlay(tabId, data);
+        
+    } else {
+        // GREEN - Safe
+        chrome.action.setBadgeText({ text: "SAFE", tabId: tabId });
+        chrome.action.setBadgeBackgroundColor({ color: "#28a745", tabId: tabId });
+        
+        console.log("🟢 Page is SAFE");
+    }
+}
 
-    // 2. Create notification
-    chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'icon.png',
-        title: '🚨 Phishing Warning!',
-        message: `This site may be dangerous!\nConfidence: ${(data.final_probability * 100).toFixed(1)}%\nClick for details.`,
-        priority: 2,
-        requireInteraction: true
-    });
-
-    // 3. Send warning to content script
+function showBlockingOverlay(tabId, data) {
     try {
+        console.log("Attempting to inject blocking overlay...");
         chrome.tabs.sendMessage(tabId, { 
-            action: "SHOW_WARNING", 
-            data: data 
+            action: "SHOW_BLOCK",
+            data: {
+                url: data.url,
+                risk_level: data.risk_level,
+                final_risk_pct: data.final_risk_pct,
+                url_prob: data.url_prob * 100,
+                content_prob: data.content_prob * 100,
+                message: data.message,
+                whitelisted: data.whitelisted
+            }
         }, (response) => {
-            // Handle potential errors silently
             if (chrome.runtime.lastError) {
-                console.warn("Could not send message to content script:", chrome.runtime.lastError.message);
+                console.warn("Could not inject overlay:", chrome.runtime.lastError.message);
+            } else {
+                console.log("✅ Blocking overlay injected");
             }
         });
     } catch (err) {
-        console.warn("Error sending warning:", err);
+        console.warn("Could not inject blocking overlay:", err);
     }
 }
 
-// Listen for extension installation/update
+function showWarningOverlay(tabId, data) {
+    try {
+        console.log("Attempting to inject warning overlay...");
+        chrome.tabs.sendMessage(tabId, { 
+            action: "SHOW_WARNING",
+            data: {
+                url: data.url,
+                risk_level: data.risk_level,
+                final_risk_pct: data.final_risk_pct,
+                url_prob: data.url_prob * 100,
+                content_prob: data.content_prob * 100,
+                message: data.message,
+                whitelisted: data.whitelisted
+            }
+        }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.warn("Could not inject overlay:", chrome.runtime.lastError.message);
+            } else {
+                console.log("✅ Warning overlay injected");
+            }
+        });
+    } catch (err) {
+        console.warn("Could not inject warning overlay:", err);
+    }
+}
+
+function showErrorBadge(tabId) {
+    chrome.action.setBadgeText({ text: "ERR", tabId: tabId });
+    chrome.action.setBadgeBackgroundColor({ color: "#6c757d", tabId: tabId });
+}
+
+// Extension loaded
 chrome.runtime.onInstalled.addListener(() => {
-    console.log("🚀 Phishing Detector Extension Loaded!");
+    console.log("="*70);
+    console.log("🚀 Rule-Based Phishing Detector Loaded!");
+    console.log("="*70);
     console.log("📡 API Endpoint:", API_ENDPOINT);
+    console.log("🔒 Method: Rule-Based Fusion (No Ensemble)");
+    console.log("🛡️  Whitelist: Enabled");
+    console.log("="*70);
 });
+
+// Log when extension starts
+console.log("🟢 Extension background script active");
+console.log("📡 Monitoring tabs for phishing...");

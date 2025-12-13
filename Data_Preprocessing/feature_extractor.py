@@ -13,13 +13,38 @@ class URLFeatureExtractor:
             "update", "confirm", "bank", "free", "bonus"
         ]
 
-        # Legitimate brand domains (for comparison)
+        # Legitimate brand domains 
         self.legitimate_brands = {
             'google.com', 'facebook.com', 'instagram.com', 'twitter.com',
             'paypal.com', 'amazon.com', 'apple.com', 'microsoft.com',
             'netflix.com', 'linkedin.com', 'youtube.com', 'ebay.com',
             'walmart.com', 'target.com', 'bankofamerica.com', 'chase.com',
-            'github.com', 'reddit.com', 'wikipedia.org', 'stackoverflow.com'
+            'github.com', 'reddit.com', 'wikipedia.org', 'stackoverflow.com',
+            # AI Tools & Services
+            'claude.ai', 'openai.com', 'chat.openai.com', 'anthropic.com',
+            'google.ai', 'gemini.google.com', 'bard.google.com',
+            'huggingface.co', 'midjourney.com', 'character.ai',
+            # Messaging Apps
+            'whatsapp.com', 'web.whatsapp.com', 'telegram.org', 'signal.org',
+            'discord.com', 'slack.com', 'zoom.us', 'teams.microsoft.com',
+            # Popular Tech Sites
+            'notion.so', 'figma.com', 'canva.com', 'dropbox.com',
+            'drive.google.com', 'docs.google.com', 'sheets.google.com',
+            # Tech Blogs & News
+            'comparitech.com', 'techcrunch.com', 'theverge.com', 'wired.com',
+            'cnet.com', 'zdnet.com', 'arstechnica.com', 'engadget.com',
+            'mashable.com', 'gizmodo.com', 'lifehacker.com', 'howtogeek.com',
+            # Educational & Reference
+            'medium.com', 'substack.com', 'dev.to', 'hashnode.com',
+            'geeksforgeeks.org', 'w3schools.com', 'tutorialspoint.com',
+            'coursera.org', 'edx.org', 'udemy.com', 'khanacademy.org',
+            # Search Engines
+            'bing.com', 'duckduckgo.com', 'yahoo.com', 'baidu.com',
+            'yandex.com', 'search.yahoo.com', 'search.brave.com',
+            # Universities (Malaysia & Asia)
+            'apu.edu.my', 'apiit.edu.my', 'lms2.apiit.edu.my',
+            'um.edu.my', 'usm.my', 'upm.edu.my',
+            'utm.my', 'ukm.my', 'nus.edu.sg', 'ntu.edu.sg'
         }
         
         # Character substitutions used in typosquatting
@@ -181,6 +206,50 @@ class URLFeatureExtractor:
         hostname_ratio = hostname_length / max(1, url_length)
         path_ratio = path_length / max(1, url_length)
 
+        # ========================================================
+        # NEW: DOMAIN TRUST SCORE
+        # ========================================================
+        # Calculate trust score based on TLD and domain characteristics
+        domain_trust_score = 0.0
+        
+        # Trusted TLDs get positive score (expanded for international)
+        trusted_tlds = {
+            'com', 'org', 'edu', 'gov', 'net',
+            'co.uk', 'ac.uk', 'gov.uk',
+            'edu.au', 'gov.au', 'com.au',
+            'edu.my', 'gov.my', 'com.my',  # Malaysia
+            'edu.sg', 'gov.sg', 'com.sg',  # Singapore
+            'ac.in', 'edu.in', 'gov.in',   # India
+            'edu.cn', 'gov.cn',            # China
+            'ac.jp', 'go.jp', 'co.jp',     # Japan
+            'edu.hk', 'gov.hk',            # Hong Kong
+            'edu.tw', 'gov.tw',            # Taiwan
+            'ac.nz', 'govt.nz', 'co.nz',   # New Zealand
+            'edu.ph', 'gov.ph'             # Philippines
+        }
+        if tld in trusted_tlds:
+            domain_trust_score += 0.3
+        
+        # Suspicious TLDs get negative score
+        if tld in self.suspicious_tlds:
+            domain_trust_score -= 0.8
+        
+        # Well-known domains get high trust
+        if domain_with_tld in self.legitimate_brands:
+            domain_trust_score += 0.7
+        
+        # Long-established patterns (heuristic indicators of legitimacy)
+        # - Reasonable domain length (not too short, not too long)
+        if 5 <= len(domain_name) <= 20:
+            domain_trust_score += 0.1
+        
+        # - Simple structure (few hyphens, no numbers in unusual places)
+        if num_hyphens == 0 and digit_ratio < 0.2:
+            domain_trust_score += 0.1
+        
+        # Normalize to [-1, 1] range
+        domain_trust_score = max(-1.0, min(1.0, domain_trust_score))
+
         features = {
             "url_length": url_length,
             "hostname_length": hostname_length,
@@ -203,7 +272,8 @@ class URLFeatureExtractor:
             "suspicious_keyword_flag": suspicious_flag,
             "url_entropy": url_entropy,
             "domain_entropy": domain_entropy,
-            "path_entropy": path_entropy
+            "path_entropy": path_entropy,
+            "domain_trust_score": domain_trust_score  # NEW FEATURE
         }
 
         # ========================================================

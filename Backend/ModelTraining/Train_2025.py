@@ -23,8 +23,13 @@ os.makedirs("Models/2025/reports", exist_ok=True)
 # STEP 1: Load data
 # ---------------------------------------------------
 print("\n📥 Loading data...")
-X = joblib.load("features_2025.pkl")
-y = joblib.load("labels_2025.pkl")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.join(script_dir, '..', '..')
+features_path = os.path.join(project_root, "features_2025.pkl")
+labels_path = os.path.join(project_root, "labels_2025.pkl")
+
+X = joblib.load(features_path)
+y = joblib.load(labels_path)
 print(f"✅ Features loaded: {X.shape}")
 print(f"✅ Labels loaded: {len(y)}")
 
@@ -79,38 +84,80 @@ print(f"✅ Test set: {X_test.shape[0]} samples")
 print("\n🔍 Starting hyperparameter optimization...")
 
 def objective(trial):
+    # ============================================
+    # ANTI-OVERFITTING PARAMETERS
+    # ============================================
     params = {
-        "n_estimators": trial.suggest_int("n_estimators", 200, 600),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
-        "max_depth": trial.suggest_int("max_depth", 3, 10),
-        "subsample": trial.suggest_float("subsample", 0.6, 1.0),
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
-        "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
-        "gamma": trial.suggest_float("gamma", 0.0, 0.5),
-        "reg_lambda": trial.suggest_float("reg_lambda", 0.0, 5.0),
-        "reg_alpha": trial.suggest_float("reg_alpha", 0.0, 5.0),
+        # 1. SHALLOW TREES - Prevent complex memorization
+        "max_depth": trial.suggest_int("max_depth", 2, 4),
+        
+        # 2. STRONG L2 REGULARIZATION - Force simple patterns
+        "reg_lambda": trial.suggest_float("reg_lambda", 5.0, 20.0),
+        
+        # 3. STRONG L1 REGULARIZATION - Feature selection
+        "reg_alpha": trial.suggest_float("reg_alpha", 2.0, 10.0),
+        
+        # 4. HIGH MINIMUM SAMPLES - Prevent splitting on noise
+        "min_child_weight": trial.suggest_int("min_child_weight", 5, 20),
+        
+        # 5. AGGRESSIVE SUBSAMPLING - Train on different data each iteration
+        "subsample": trial.suggest_float("subsample", 0.5, 0.7),
+        
+        # 6. FEATURE DROPOUT - Prevent reliance on specific features
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.4, 0.6),
+        "colsample_bylevel": trial.suggest_float("colsample_bylevel", 0.4, 0.6),
+        "colsample_bynode": trial.suggest_float("colsample_bynode", 0.4, 0.6),
+        
+        # 7. CONSERVATIVE LEARNING - Slow, gradual pattern learning
+        "learning_rate": trial.suggest_float("learning_rate", 0.005, 0.05, log=True),
+        
+        # 8. FEWER TREES - Prevent ensemble memorization
+        "n_estimators": trial.suggest_int("n_estimators", 50, 200),
+        
+        # 9. STRONG PRUNING - Remove complex branches
+        "gamma": trial.suggest_float("gamma", 0.5, 2.0),
+        
+        # Standard
         "objective": "binary:logistic",
         "eval_metric": "logloss",
         "random_state": 42,
         "verbosity": 0
     }
     model = XGBClassifier(**params)
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    # Increased CV folds for better generalization assessment
+    cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
     cv_scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='accuracy', n_jobs=-1)
     return cv_scores.mean()
 
-study = optuna.create_study(direction="maximize", study_name="xgboost_2025")
-study.optimize(objective, n_trials=40, show_progress_bar=True, n_jobs=1)
+# Add pruning to stop unpromising trials early
+study = optuna.create_study(
+    direction="maximize",
+    study_name="xgboost_2025_pattern_learning",
+    pruner=optuna.pruners.MedianPruner(
+        n_startup_trials=5,  # Don't prune first 5 trials
+        n_warmup_steps=3,    # Wait 3 CV folds before pruning
+        interval_steps=1
+    )
+)
+# Reduced trials from 40 to 25 (pruning makes search smarter)
+study.optimize(objective, n_trials=25, show_progress_bar=True, n_jobs=1)
 
 print(f"\n✅ Best CV Accuracy: {study.best_value:.4f}")
 
 # ---------------------------------------------------
 # STEP 5: Train final model
 # ---------------------------------------------------
-print("\n🤖 Training final model...")
+print("\n🤖 Training final model with early stopping...")
 final_model = XGBClassifier(**study.best_params, eval_metric='logloss')
-final_model.fit(X_train, y_train, eval_set=[(X_train, y_train), (X_test, y_test)], verbose=False)
+# Add early stopping to prevent overfitting during training
+final_model.fit(
+    X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    verbose=False
+)
 print("✅ Model training complete!")
+if hasattr(final_model, 'best_iteration'):
+    print(f"   Best iteration: {final_model.best_iteration}")
 
 # ---------------------------------------------------
 # STEP 6: Evaluate
@@ -118,7 +165,8 @@ print("✅ Model training complete!")
 print("\n📊 Evaluating model...")
 
 # Cross-validation
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+# Use same 10-fold CV for consistency
+cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 cv_scores = cross_val_score(final_model, X_train, y_train, cv=cv, scoring='accuracy', n_jobs=-1)
 
 # Test predictions

@@ -1,39 +1,41 @@
 {
-    "training_date": "2025-12-13 06:23:43",
+    "training_date": "2025-12-14 03:31:48",
     "model_type": "XGBoost Classifier",
     "label_encoding": "0=Legitimate, 1=Phishing",
     "dataset": {
-        "total_samples": 336748,
-        "training_samples": 269398,
-        "test_samples": 67350,
-        "num_features": 32,
+        "total_samples": 236643,
+        "training_samples": 189314,
+        "test_samples": 47329,
+        "num_features": 33,
         "label_distribution": {
-            "Legitimate": 160943,
-            "Phishing": 175805
+            "Legitimate": 101793,
+            "Phishing": 134850
         }
     },
     "hyperparameters": {
-        "n_estimators": 228,
-        "learning_rate": 0.1957800274548136,
-        "max_depth": 10,
-        "subsample": 0.9625094106004689,
-        "colsample_bytree": 0.8413509119314768,
-        "min_child_weight": 2,
-        "gamma": 0.21159550847993433,
-        "reg_lambda": 4.782781199860142,
-        "reg_alpha": 0.006513309784073995
+        "max_depth": 3,
+        "reg_lambda": 6.799061546665725,
+        "reg_alpha": 6.278201578287344,
+        "min_child_weight": 12,
+        "subsample": 0.6449780170719758,
+        "colsample_bytree": 0.40430590033548214,
+        "colsample_bylevel": 0.43930643357613935,
+        "colsample_bynode": 0.5619663795026993,
+        "learning_rate": 0.0475472486873617,
+        "n_estimators": 198,
+        "gamma": 1.0372119171888485
     },
     "performance": {
-        "test_accuracy": 0.9940163325909428,
-        "train_accuracy": 0.9963511236163595,
-        "cv_accuracy_mean": 0.9948960274385344,
-        "cv_accuracy_std": 0.00018485442681391397,
-        "overfitting_gap": 0.0023347910254166715
+        "test_accuracy": 0.9899849986266348,
+        "train_accuracy": 0.9904180356444848,
+        "cv_accuracy_mean": 0.9902754172823492,
+        "cv_accuracy_std": 0.0005700796579490685,
+        "overfitting_gap": 0.00043303701785002424
     },
     "confusion_matrix": {
-        "true_negatives": 32135,
-        "false_positives": 54,
-        "false_negatives": 349,
-        "true_positives": 34812
+        "true_negatives": 19917,
+        "false_positives": 442,
+        "false_negatives": 32,
+        "true_positives": 26938
     }
 }

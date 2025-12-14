@@ -136,7 +136,6 @@ class RuleBasedFusionPredictor:
         both_say_phishing = url_says_phishing and content_says_phishing
         
         if both_say_phishing and agreement > 60:
-            # REDUCED: Changed from 0.10 to 0.03 to prevent always hitting 100%
             boost = agreement * 0.03  # More conservative boost
             print(f"\n🔹 Rule 2 - Agreement Boost:")
             print(f"   Both models predict phishing (>{50}%)")
@@ -173,8 +172,8 @@ class RuleBasedFusionPredictor:
         print(f"\n" + "="*70)
         print(" 🎯 FINAL CALCULATION")
         print("="*70)
-        print(f"\n   final_risk = base + penalty + boost - html_adj")
-        print(f"   final_risk = {base_risk:.1f} + {penalty:.1f} + {boost:.1f} - {html_adjustment:.1f}")
+        print(f"\n   final_risk = base + boost - html_adj")
+        print(f"   final_risk = {base_risk:.1f} + {boost:.1f} - {html_adjustment:.1f}")
         print(f"   final_risk = {final_risk:.1f}%")
         
         return final_risk / 100 

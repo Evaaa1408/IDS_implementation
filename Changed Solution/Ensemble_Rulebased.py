@@ -104,33 +104,29 @@ class RuleBasedFusionPredictor:
         print(f"   Model 2023 (Content): {content_pct:.1f}%")
         print(f"   HTML Available:       {html_available}")
         
-        # --------------------------------------------------------
-        # RULE 1: Pessimistic Base (Take the Maximum)
-        # --------------------------------------------------------
-        base_risk = max(url_pct, content_pct)
-        print(f"\n🔹 Rule 1 - Pessimistic Base:")
-        print(f"   base_risk = MAX({url_pct:.1f}%, {content_pct:.1f}%) = {base_risk:.1f}%")
-        print(f"   Reason: If EITHER model detects risk, we take it seriously")
-        
-        # --------------------------------------------------------
-        # RULE 2: Disagreement Penalty
-        # --------------------------------------------------------
+        # Calculate disagreement
         disagreement = abs(url_pct - content_pct)
-        penalty = 0.0
-        
-        if disagreement > 40:
-            penalty = disagreement * 0.15
-            print(f"\n🔹 Rule 2 - Disagreement Penalty:")
-            print(f"   disagreement = |{url_pct:.1f}% - {content_pct:.1f}%| = {disagreement:.1f}%")
-            print(f"   penalty = {disagreement:.1f}% × 0.15 = {penalty:.1f}%")
-            print(f"   Reason: Models disagree by {disagreement:.1f}% → Add uncertainty")
-        else:
-            print(f"\n🔹 Rule 2 - Disagreement Penalty:")
-            print(f"   disagreement = {disagreement:.1f}% (< 40% threshold)")
-            print(f"   penalty = 0% (models agree reasonably)")
         
         # --------------------------------------------------------
-        # RULE 3: Agreement Boost (When Both Say Phishing)
+        # RULE 1: Agreement vs Disagreement
+        # --------------------------------------------------------
+        if disagreement > 40:
+            # Models DISAGREE → Use 50/50 average
+            base_risk = (url_pct + content_pct) / 2
+            print(f"\n🔹 Rule 1 - Disagreement (50/50 Average):")
+            print(f"   disagreement = |{url_pct:.1f}% - {content_pct:.1f}%| = {disagreement:.1f}%")
+            print(f"   base_risk = ({url_pct:.1f}% + {content_pct:.1f}%) / 2 = {base_risk:.1f}%")
+            print(f"   Reason: High disagreement → Equal weight to both models")
+        else:
+            # Models AGREE → Use MAX
+            base_risk = max(url_pct, content_pct)
+            print(f"\n🔹 Rule 1 - Agreement (MAX):")
+            print(f"   disagreement = {disagreement:.1f}% (< 40% threshold)")
+            print(f"   base_risk = MAX({url_pct:.1f}%, {content_pct:.1f}%) = {base_risk:.1f}%")
+            print(f"   Reason: Models agree → Take higher risk")
+        
+        # --------------------------------------------------------
+        # RULE 2: Agreement Boost (When Both Say Phishing)
         # --------------------------------------------------------
         agreement = 100 - disagreement
         boost = 0.0
@@ -140,37 +136,38 @@ class RuleBasedFusionPredictor:
         both_say_phishing = url_says_phishing and content_says_phishing
         
         if both_say_phishing and agreement > 60:
-            boost = agreement * 0.10
-            print(f"\n🔹 Rule 3 - Agreement Boost:")
+            # REDUCED: Changed from 0.10 to 0.03 to prevent always hitting 100%
+            boost = agreement * 0.03  # More conservative boost
+            print(f"\n🔹 Rule 2 - Agreement Boost:")
             print(f"   Both models predict phishing (>{50}%)")
             print(f"   agreement = {agreement:.1f}% (> 60% threshold)")
-            print(f"   boost = {agreement:.1f}% × 0.10 = {boost:.1f}%")
+            print(f"   boost = {agreement:.1f}% × 0.03 = {boost:.1f}%")
             print(f"   Reason: Strong consensus on danger → Amplify signal")
         else:
-            print(f"\n🔹 Rule 3 - Agreement Boost:")
+            print(f"\n🔹 Rule 2 - Agreement Boost:")
             if not both_say_phishing:
                 print(f"   Not both predicting phishing → No boost")
             else:
                 print(f"   agreement = {agreement:.1f}% (< 60% threshold) → No boost")
         
         # --------------------------------------------------------
-        # RULE 4: HTML Availability Adjustment
+        # RULE 3: HTML Availability Adjustment
         # --------------------------------------------------------
         html_adjustment = 0.0
         
         if not html_available:
             html_adjustment = 5.0
-            print(f"\n🔹 Rule 4 - HTML Adjustment:")
+            print(f"\n🔹 Rule 3 - HTML Adjustment:")
             print(f"   HTML not available → Reduce confidence by {html_adjustment:.1f}%")
             print(f"   Reason: Can't verify content, rely only on URL")
         else:
-            print(f"\n🔹 Rule 4 - HTML Adjustment:")
+            print(f"\n🔹 Rule 3 - HTML Adjustment:")
             print(f"   HTML available → No adjustment needed")
         
         # --------------------------------------------------------
         # FINAL CALCULATION
         # --------------------------------------------------------
-        final_risk = base_risk + penalty + boost - html_adjustment
+        final_risk = base_risk + boost - html_adjustment
         final_risk = max(0, min(100, final_risk)) 
         
         print(f"\n" + "="*70)
@@ -292,8 +289,7 @@ class RuleBasedFusionPredictor:
             df_25 = df_25.reindex(columns=self.feats_2025, fill_value=0)
             
             proba_2025 = self.model_2025.predict_proba(df_25)[0]
-            # FIX: Model 2025 labels are inverted - use proba[0] for phishing probability
-            prob_phish_2025 = proba_2025[0]  # Changed from [1] to [0]
+            prob_phish_2025 = proba_2025[1]
             pred_2025 = 1 if prob_phish_2025 > 0.5 else 0
             
             results['url_pred'] = pred_2025

@@ -26,6 +26,38 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
         // Skip chrome internal
         if (domain.startsWith('chrome')) return;
         
+        // Skip search engines and common safe sites
+        const skipDomains = [
+            'google.com', 'www.google.com', 'google.com.my', 'google.co.uk',
+            'bing.com', 'www.bing.com',
+            'duckduckgo.com', 'www.duckduckgo.com',
+            'yahoo.com', 'www.yahoo.com', 'search.yahoo.com',
+            'baidu.com', 'www.baidu.com',
+            'yandex.com', 'www.yandex.com',
+            'shopee.com.my', 'shopee.sg', 'shopee.ph', 'shopee.co.id',
+            'www.shopee.com.my', 'www.shopee.sg',
+            'lazada.com.my', 'lazada.sg', 'lazada.co.th',
+            'www.lazada.com.my', 'www.lazada.sg',
+            'amazon.com', 'www.amazon.com', 'amazon.sg',
+            'sephora.com', 'www.sephora.com', 'sephora.my', 'www.sephora.my',
+            'zalora.com.my', 'www.zalora.com.my'
+        ];
+        
+        if (skipDomains.includes(domain)) {
+            console.log("⏭️ Skipping safe domain:", domain);
+            return;
+        }
+        
+        // Also skip if URL contains search query patterns
+        const urlPath = urlObj.pathname + urlObj.search;
+        if (urlPath.includes('/search?') || 
+            urlPath.includes('?q=') || 
+            urlPath.includes('&q=') ||
+            urlPath.includes('?query=')) {
+            console.log("⏭️ Skipping search query URL:", url);
+            return;
+        }
+        
         // Get last checked domain
         const lastDomain = checkedTabs.get(tabId);
         
@@ -200,16 +232,15 @@ async function fastSecurityCheck(url, tabId) {
         // Store result for post-load notification
         checkResults.set(tabId, data);
         
-        // If high risk (>60%), BLOCK immediately by injecting block overlay
-        if (data.final_risk_pct > 60 || data.risk_level === 'VERY SUSPICIOUS') {
-            console.log("🚫 BLOCKING - High risk detected:", data.final_risk_pct + "%");
+        // CHANGED: Block VERY HIGH risk (>80%) with RED, Medium risk (40-80%) with YELLOW
+        if (data.final_risk_pct > 80 || data.risk_level === 'VERY SUSPICIOUS') {
+            console.log("🚫 HIGH RISK BLOCKING - Risk:", data.final_risk_pct.toFixed(1) + "%");
             
-            // Wait a moment for tab to be ready, then inject block
+            // Inject RED blocking page
             setTimeout(() => {
                 chrome.scripting.executeScript({
                     target: { tabId: tabId },
                     func: (riskData) => {
-                        // Clear and block page
                         document.documentElement.innerHTML = '';
                         document.body.innerHTML = `
                             <style>
@@ -249,19 +280,62 @@ async function fastSecurityCheck(url, tabId) {
                 });
             }, 100);
             
-            // Set red badge
             chrome.action.setBadgeText({ text: "⛔", tabId });
             chrome.action.setBadgeBackgroundColor({ color: "#DC2626", tabId });
             
+        } else if (data.final_risk_pct > 40) {
+            // MEDIUM risk - show YELLOW warning before page loads
+            console.log("⚠️ MEDIUM RISK WARNING - Risk:", data.final_risk_pct.toFixed(1) + "%");
+            
+            setTimeout(() => {
+                chrome.scripting.executeScript({
+                    target: { tabId: tabId },
+                    func: (riskData) => {
+                        document.documentElement.innerHTML = '';
+                        document.body.innerHTML = `
+                            <style>
+                                body { margin: 0; padding: 0; overflow: hidden; 
+                                       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                                       display: flex; align-items: center; justify-content: center;
+                                       min-height: 100vh; color: white;
+                                       font-family: -apple-system, system-ui, sans-serif; }
+                                .content { text-align: center; max-width: 600px; padding: 40px; }
+                                h1 { font-size: 48px; margin-bottom: 20px; }
+                                p { font-size: 20px; margin-bottom: 40px; opacity: 0.95; }
+                                .stats { display: flex; gap: 30px; justify-content: center; margin-bottom: 40px; }
+                                .stat { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; }
+                                .label { font-size: 12px; text-transform: uppercase; opacity: 0.8; }
+                                .value { font-size: 36px; font-weight: 700; margin-top: 8px; }
+                                button { padding: 16px 32px; font-size: 18px; font-weight: 600;
+                                        border: none; border-radius: 8px; cursor: pointer; margin: 0 10px; }
+                                .primary { background: white; color: #d97706; }
+                                .secondary { background: transparent; color: white; border: 2px solid white; }
+                            </style>
+                            <div class="content">
+                                <h1>⚠️ SUSPICIOUS WEBSITE</h1>
+                                <p>This website shows some suspicious characteristics.<br>
+                                Proceed with caution if you trust this source.</p>
+                                <div class="stats">
+                                    <div class="stat">
+                                        <div class="label">Risk Level</div>
+                                        <div class="value">${riskData.risk}%</div>
+                                    </div>
+                                </div>
+                                <button class="primary" onclick="history.back()">◀ Go Back (Recommended)</button>
+                                <button class="secondary" onclick="location.reload()">Proceed Anyway ▶</button>
+                            </div>
+                        `;
+                    },
+                    args: [{ risk: data.final_risk_pct }]
+                });
+            }, 100);
+            
+            chrome.action.setBadgeText({ text: "⚠", tabId });
+            chrome.action.setBadgeBackgroundColor({ color: "#FF9800", tabId });
         } else {
-            // Medium/low risk - set badge, notification will show post-load
-            if (data.final_risk_pct > 40) {
-                chrome.action.setBadgeText({ text: "⚠", tabId });
-                chrome.action.setBadgeBackgroundColor({ color: "#FF9800", tabId });
-            } else {
-                chrome.action.setBadgeText({ text: "✓", tabId });
-                chrome.action.setBadgeBackgroundColor({ color: "#10B981", tabId });
-            }
+            // Low risk - set green badge
+            chrome.action.setBadgeText({ text: "✓", tabId });
+            chrome.action.setBadgeBackgroundColor({ color: "#10B981", tabId });
         }
         
     } catch (error) {

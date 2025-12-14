@@ -42,7 +42,7 @@ class URLFeatureExtractor:
             'bing.com', 'duckduckgo.com', 'yahoo.com', 'baidu.com',
             'yandex.com', 'search.yahoo.com', 'search.brave.com',
             # Universities (Malaysia & Asia)
-            'apu.edu.my', 'apiit.edu.my', 'lms2.apiit.edu.my',
+            'apu.edu.my', 'apspace.apu.edu.my', 'apiit.edu.my', 'lms2.apiit.edu.my',
             'um.edu.my', 'usm.my', 'upm.edu.my',
             'utm.my', 'ukm.my', 'nus.edu.sg', 'ntu.edu.sg'
         }

@@ -102,11 +102,11 @@ def predict():
 
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
-    """Serves the Admin Dashboard HTML (OPTIONAL - can remove)"""
-    dashboard_path = os.path.join(os.path.dirname(__file__), '../../Frontend/dashboard.html')
+    """Serves the Admin Dashboard HTML"""
+    dashboard_path = os.path.join(os.path.dirname(__file__), '../Frontend/dashboard.html')
     if os.path.exists(dashboard_path):
         return send_file(dashboard_path)
-    return "Dashboard not available in rule-based version", 404
+    return "Dashboard not available - file not found", 404
 
 @app.route("/api/stats", methods=["GET"])
 def get_stats():

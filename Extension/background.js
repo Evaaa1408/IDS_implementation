@@ -208,6 +208,71 @@ async function fastSecurityCheck(url, tabId) {
     try {
         console.log("🛡️ Pre-navigation check:", url);
         
+        // IMMEDIATELY inject "Checking..." overlay to prevent page from showing
+        setTimeout(() => {
+            chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                func: () => {
+                    // Block entire page with semi-transparent overlay + small popup
+                    const overlay = document.createElement('div');
+                    overlay.id = 'phishing-check-overlay';
+                    overlay.innerHTML = `
+                        <style>
+                            #phishing-check-overlay {
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background: rgba(0, 0, 0, 0.85);
+                                backdrop-filter: blur(10px);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                z-index: 999999;
+                                font-family: -apple-system, system-ui, sans-serif;
+                            }
+                            .check-card {
+                                background: white;
+                                border-radius: 16px;
+                                padding: 30px 40px;
+                                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                                text-align: center;
+                                max-width: 320px;
+                            }
+                            .spinner {
+                                width: 40px;
+                                height: 40px;
+                                margin: 0 auto 20px;
+                                border: 3px solid #e5e7eb;
+                                border-top-color: #3b82f6;
+                                border-radius: 50%;
+                                animation: spin 0.8s linear infinite;
+                            }
+                            @keyframes spin { to { transform: rotate(360deg); } }
+                            .check-card h3 {
+                                margin: 0 0 10px 0;
+                                font-size: 18px;
+                                font-weight: 600;
+                                color: #1f2937;
+                            }
+                            .check-card p {
+                                margin: 0;
+                                font-size: 14px;
+                                color: #6b7280;
+                            }
+                        </style>
+                        <div class="check-card">
+                            <div class="spinner"></div>
+                            <h3>🔍 Checking Security</h3>
+                            <p>Analyzing for threats...</p>
+                        </div>
+                    `;
+                    document.body.appendChild(overlay);
+                }
+            }).catch(err => console.error("Failed to inject checking overlay:", err));
+        }, 10); // Very fast injection
+        
         // Fast URL-only check
         const response = await fetch(API_ENDPOINT, {
             method: "POST",
@@ -236,49 +301,10 @@ async function fastSecurityCheck(url, tabId) {
         if (data.final_risk_pct > 80 || data.risk_level === 'VERY SUSPICIOUS') {
             console.log("🚫 HIGH RISK BLOCKING - Risk:", data.final_risk_pct.toFixed(1) + "%");
             
-            // Inject RED blocking page
-            setTimeout(() => {
-                chrome.scripting.executeScript({
-                    target: { tabId: tabId },
-                    func: (riskData) => {
-                        document.documentElement.innerHTML = '';
-                        document.body.innerHTML = `
-                            <style>
-                                body { margin: 0; padding: 0; overflow: hidden; 
-                                       background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-                                       display: flex; align-items: center; justify-content: center;
-                                       min-height: 100vh; color: white;
-                                       font-family: -apple-system, system-ui, sans-serif; }
-                                .content { text-align: center; max-width: 600px; padding: 40px; }
-                                h1 { font-size: 48px; margin-bottom: 20px; }
-                                p { font-size: 20px; margin-bottom: 40px; opacity: 0.9; }
-                                .stats { display: flex; gap: 30px; justify-content: center; margin-bottom: 40px; }
-                                .stat { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; }
-                                .label { font-size: 12px; text-transform: uppercase; opacity: 0.7; }
-                                .value { font-size: 36px; font-weight: 700; margin-top: 8px; }
-                                button { padding: 16px 32px; font-size: 18px; font-weight: 600;
-                                        border: none; border-radius: 8px; cursor: pointer; margin: 0 10px; }
-                                .primary { background: white; color: #dc2626; }
-                                .secondary { background: transparent; color: white; border: 2px solid white; }
-                            </style>
-                            <div class="content">
-                                <h1>🛡️ PHISHING DETECTED</h1>
-                                <p>This website has been flagged as dangerously suspicious.<br>
-                                Proceeding may result in identity theft.</p>
-                                <div class="stats">
-                                    <div class="stat">
-                                        <div class="label">Risk Level</div>
-                                        <div class="value">${riskData.risk}%</div>
-                                    </div>
-                                </div>
-                                <button class="primary" onclick="history.back()">◀ Go Back</button>
-                                <button class="secondary" onclick="location.reload()">I Understand ▶</button>
-                            </div>
-                        `;
-                    },
-                    args: [{ risk: data.final_risk_pct }]
-                });
-            }, 100);
+            // Redirect to local blocking page (works even if target doesn't exist)
+            const blockUrl = chrome.runtime.getURL('block.html') + 
+                `?url=${encodeURIComponent(url)}&risk=${data.final_risk_pct.toFixed(1)}&level=high`;
+            chrome.tabs.update(tabId, { url: blockUrl });
             
             chrome.action.setBadgeText({ text: "⛔", tabId });
             chrome.action.setBadgeBackgroundColor({ color: "#DC2626", tabId });
@@ -287,55 +313,28 @@ async function fastSecurityCheck(url, tabId) {
             // MEDIUM risk - show YELLOW warning before page loads
             console.log("⚠️ MEDIUM RISK WARNING - Risk:", data.final_risk_pct.toFixed(1) + "%");
             
-            setTimeout(() => {
-                chrome.scripting.executeScript({
-                    target: { tabId: tabId },
-                    func: (riskData) => {
-                        document.documentElement.innerHTML = '';
-                        document.body.innerHTML = `
-                            <style>
-                                body { margin: 0; padding: 0; overflow: hidden; 
-                                       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                                       display: flex; align-items: center; justify-content: center;
-                                       min-height: 100vh; color: white;
-                                       font-family: -apple-system, system-ui, sans-serif; }
-                                .content { text-align: center; max-width: 600px; padding: 40px; }
-                                h1 { font-size: 48px; margin-bottom: 20px; }
-                                p { font-size: 20px; margin-bottom: 40px; opacity: 0.95; }
-                                .stats { display: flex; gap: 30px; justify-content: center; margin-bottom: 40px; }
-                                .stat { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; }
-                                .label { font-size: 12px; text-transform: uppercase; opacity: 0.8; }
-                                .value { font-size: 36px; font-weight: 700; margin-top: 8px; }
-                                button { padding: 16px 32px; font-size: 18px; font-weight: 600;
-                                        border: none; border-radius: 8px; cursor: pointer; margin: 0 10px; }
-                                .primary { background: white; color: #d97706; }
-                                .secondary { background: transparent; color: white; border: 2px solid white; }
-                            </style>
-                            <div class="content">
-                                <h1>⚠️ SUSPICIOUS WEBSITE</h1>
-                                <p>This website shows some suspicious characteristics.<br>
-                                Proceed with caution if you trust this source.</p>
-                                <div class="stats">
-                                    <div class="stat">
-                                        <div class="label">Risk Level</div>
-                                        <div class="value">${riskData.risk}%</div>
-                                    </div>
-                                </div>
-                                <button class="primary" onclick="history.back()">◀ Go Back (Recommended)</button>
-                                <button class="secondary" onclick="location.reload()">Proceed Anyway ▶</button>
-                            </div>
-                        `;
-                    },
-                    args: [{ risk: data.final_risk_pct }]
-                });
-            }, 100);
+            // Redirect to local warning page
+            const blockUrl = chrome.runtime.getURL('block.html') + 
+                `?url=${encodeURIComponent(url)}&risk=${data.final_risk_pct.toFixed(1)}&level=medium`;
+            chrome.tabs.update(tabId, { url: blockUrl });
             
             chrome.action.setBadgeText({ text: "⚠", tabId });
             chrome.action.setBadgeBackgroundColor({ color: "#FF9800", tabId });
         } else {
-            // Low risk - set green badge
+            // Low risk - REMOVE checking overlay and allow page to load
             chrome.action.setBadgeText({ text: "✓", tabId });
             chrome.action.setBadgeBackgroundColor({ color: "#10B981", tabId });
+            
+            // Remove the checking overlay
+            setTimeout(() => {
+                chrome.scripting.executeScript({
+                    target: { tabId: tabId },
+                    func: () => {
+                        const overlay = document.getElementById('phishing-check-overlay');
+                        if (overlay) overlay.remove();
+                    }
+                }).catch(err => console.log("Overlay already removed:", err));
+            }, 100);
         }
         
     } catch (error) {

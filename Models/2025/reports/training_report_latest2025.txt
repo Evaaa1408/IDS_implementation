@@ -2,83 +2,83 @@
  MODEL 2025 - TRAINING REPORT
 ================================================================================
 
-Generated: 2025-12-14 03:31:48
+Generated: 2025-12-14 05:01:27
 
 ================================================================================
 
 📊 DATASET INFORMATION
 --------------------------------------------------------------------------------
-Total Samples:          236,643
-Training Samples:       189,314
-Test Samples:           47,329
+Total Samples:          274,568
+Training Samples:       219,654
+Test Samples:           54,914
 Number of Features:     33
 
 Label Distribution:
-  Legitimate:           101,793 (43.0%)
-  Phishing:             134,850 (57.0%)
+  Legitimate:           131,135 (47.8%)
+  Phishing:             143,433 (52.2%)
 
 ================================================================================
 
 🎯 MODEL PERFORMANCE
 --------------------------------------------------------------------------------
-Test Accuracy:          0.9900 (99.00%)
-Train Accuracy:         0.9904 (99.04%)
-CV Accuracy:            0.9903 ± 0.0006
-Overfitting Gap:        0.0004
+Test Accuracy:          0.9928 (99.28%)
+Train Accuracy:         0.9929 (99.29%)
+CV Accuracy:            0.9928 ± 0.0005
+Overfitting Gap:        0.0002
   ✅ Excellent - Minimal overfitting
 
 ================================================================================
 
 📋 CONFUSION MATRIX
 --------------------------------------------------------------------------------
-True Negatives (Legit → Legit):      19,917
-False Positives (Legit → Phishing):  442
-False Negatives (Phishing → Legit):  32
-True Positives (Phishing → Phishing): 26,938
+True Negatives (Legit → Legit):      26,217
+False Positives (Legit → Phishing):  10
+False Negatives (Phishing → Legit):  388
+True Positives (Phishing → Phishing): 28,299
 
-False Positive Rate:    0.0217 (2.17%)
-False Negative Rate:    0.0012 (0.12%)
+False Positive Rate:    0.0004 (0.04%)
+False Negative Rate:    0.0135 (1.35%)
 
 ================================================================================
 
 🏆 TOP 20 MOST IMPORTANT FEATURES
 --------------------------------------------------------------------------------
-uses_https                     0.319277
-path_length                    0.142321
-path_ratio                     0.090140
-num_slashes                    0.081707
-digit_ratio                    0.047385
-num_special_char               0.046028
-ExcessiveHyphens               0.029966
-path_entropy                   0.028661
-url_length                     0.024187
-hostname_length                0.024169
-domain_trust_score             0.022809
-subdomain_depth                0.020877
-SuspiciousTLD                  0.020564
-letter_ratio                   0.016852
-hostname_ratio                 0.015829
-url_entropy                    0.013255
-domain_entropy                 0.012773
-tld_length                     0.011077
-num_dots                       0.005759
-suspicious_keyword_flag        0.005250
+path_length                    0.148159
+num_slashes                    0.137382
+path_ratio                     0.136054
+uses_https                     0.122052
+contains_ip                    0.083151
+path_entropy                   0.056444
+num_special_char               0.046522
+digit_ratio                    0.044548
+num_hyphens                    0.039450
+hostname_ratio                 0.031324
+letter_ratio                   0.023345
+url_entropy                    0.021537
+domain_trust_score             0.016814
+subdomain_depth                0.011251
+num_equal                      0.010958
+domain_entropy                 0.010783
+url_length                     0.009531
+SuspiciousTLD                  0.009256
+ExcessiveHyphens               0.008551
+tld_length                     0.007039
 
 ================================================================================
 
 ⚙️  HYPERPARAMETERS
 --------------------------------------------------------------------------------
 max_depth                 3
-reg_lambda                6.799061546665725
-reg_alpha                 6.278201578287344
-min_child_weight          12
-subsample                 0.6449780170719758
-colsample_bytree          0.40430590033548214
-colsample_bylevel         0.43930643357613935
-colsample_bynode          0.5619663795026993
-learning_rate             0.0475472486873617
-n_estimators              198
-gamma                     1.0372119171888485
+reg_lambda                6.312695613460964
+reg_alpha                 4.173299268615059
+min_child_weight          13
+subsample                 0.500537119681817
+colsample_bytree          0.5720297501257122
+colsample_bylevel         0.5147323555893614
+colsample_bynode          0.47044458437520587
+learning_rate             0.04663960566954563
+n_estimators              196
+gamma                     1.3228476993357345
 
 ================================================================================
 

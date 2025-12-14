@@ -135,8 +135,8 @@ print(f"✅ Saved: labels_2025.pkl")
 # Final Verification
 # ========================================================
 print(f"\n🔍 Final Verification:")
-loaded_features = joblib.load("features_2025.pkl")
-loaded_labels = joblib.load("labels_2025.pkl")
+loaded_features = joblib.load("Models/2025/features_2025.pkl")
+loaded_labels = joblib.load("Models/2025/labels_2025.pkl")
 
 print(f"   Features shape: {loaded_features.shape}")
 print(f"   Labels count: {len(loaded_labels)}")

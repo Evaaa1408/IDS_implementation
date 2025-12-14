@@ -292,7 +292,8 @@ class RuleBasedFusionPredictor:
             df_25 = df_25.reindex(columns=self.feats_2025, fill_value=0)
             
             proba_2025 = self.model_2025.predict_proba(df_25)[0]
-            prob_phish_2025 = proba_2025[1]
+            # FIX: Model 2025 labels are inverted - use proba[0] for phishing probability
+            prob_phish_2025 = proba_2025[0]  # Changed from [1] to [0]
             pred_2025 = 1 if prob_phish_2025 > 0.5 else 0
             
             results['url_pred'] = pred_2025

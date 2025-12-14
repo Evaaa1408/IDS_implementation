@@ -1,41 +1,41 @@
 {
-    "training_date": "2025-12-14 03:31:48",
+    "training_date": "2025-12-14 05:01:27",
     "model_type": "XGBoost Classifier",
     "label_encoding": "0=Legitimate, 1=Phishing",
     "dataset": {
-        "total_samples": 236643,
-        "training_samples": 189314,
-        "test_samples": 47329,
+        "total_samples": 274568,
+        "training_samples": 219654,
+        "test_samples": 54914,
         "num_features": 33,
         "label_distribution": {
-            "Legitimate": 101793,
-            "Phishing": 134850
+            "Legitimate": 131135,
+            "Phishing": 143433
         }
     },
     "hyperparameters": {
         "max_depth": 3,
-        "reg_lambda": 6.799061546665725,
-        "reg_alpha": 6.278201578287344,
-        "min_child_weight": 12,
-        "subsample": 0.6449780170719758,
-        "colsample_bytree": 0.40430590033548214,
-        "colsample_bylevel": 0.43930643357613935,
-        "colsample_bynode": 0.5619663795026993,
-        "learning_rate": 0.0475472486873617,
-        "n_estimators": 198,
-        "gamma": 1.0372119171888485
+        "reg_lambda": 6.312695613460964,
+        "reg_alpha": 4.173299268615059,
+        "min_child_weight": 13,
+        "subsample": 0.500537119681817,
+        "colsample_bytree": 0.5720297501257122,
+        "colsample_bylevel": 0.5147323555893614,
+        "colsample_bynode": 0.47044458437520587,
+        "learning_rate": 0.04663960566954563,
+        "n_estimators": 196,
+        "gamma": 1.3228476993357345
     },
     "performance": {
-        "test_accuracy": 0.9899849986266348,
-        "train_accuracy": 0.9904180356444848,
-        "cv_accuracy_mean": 0.9902754172823492,
-        "cv_accuracy_std": 0.0005700796579490685,
-        "overfitting_gap": 0.00043303701785002424
+        "test_accuracy": 0.9927523036019958,
+        "train_accuracy": 0.9929206843490217,
+        "cv_accuracy_mean": 0.9927522370261231,
+        "cv_accuracy_std": 0.0004592606637159966,
+        "overfitting_gap": 0.0001683807470258536
     },
     "confusion_matrix": {
-        "true_negatives": 19917,
-        "false_positives": 442,
-        "false_negatives": 32,
-        "true_positives": 26938
+        "true_negatives": 26217,
+        "false_positives": 10,
+        "false_negatives": 388,
+        "true_positives": 28299
     }
 }

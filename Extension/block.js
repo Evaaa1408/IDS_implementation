@@ -17,8 +17,6 @@ if (level === 'medium') {
 }
 
 function goBack() {
-    // Close the current tab instead of going back
-    // (going back would try to load the blocked URL again)
     window.close();
 }
 
@@ -27,8 +25,14 @@ function openDashboard() {
 }
 
 function proceedAnyway() {
-    // Go to the blocked URL
-    window.location.href = decodeURIComponent(blockedUrl);
+    // Tell background script to bypass this URL
+    chrome.runtime.sendMessage({
+        action: 'BYPASS_URL',
+        url: decodeURIComponent(blockedUrl)
+    }, () => {
+        // After background script adds to bypass list, navigate
+        window.location.href = decodeURIComponent(blockedUrl);
+    });
 }
 
 // Add event listeners when DOM is ready

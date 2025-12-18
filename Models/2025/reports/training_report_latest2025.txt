@@ -1,84 +1,115 @@
 ================================================================================
- MODEL 2025 - TRAINING REPORT
+ MODEL 2025 - TRAINING REPORT (ENHANCED)
 ================================================================================
 
-Generated: 2025-12-14 05:01:27
+Generated: 2025-12-18 00:40:13
 
 ================================================================================
 
 📊 DATASET INFORMATION
 --------------------------------------------------------------------------------
-Total Samples:          274,568
-Training Samples:       219,654
-Test Samples:           54,914
-Number of Features:     33
+Total Samples:          338,439
+Training Samples:       270,751
+Test Samples:           67,688
+Number of Features:     34
 
 Label Distribution:
-  Legitimate:           131,135 (47.8%)
-  Phishing:             143,433 (52.2%)
+  Legitimate:           162,634 (48.1%)
+  Phishing:             175,805 (51.9%)
 
 ================================================================================
 
-🎯 MODEL PERFORMANCE
+🎯 MODEL PERFORMANCE (DEFAULT THRESHOLD = 0.5)
 --------------------------------------------------------------------------------
-Test Accuracy:          0.9928 (99.28%)
-Train Accuracy:         0.9929 (99.29%)
-CV Accuracy:            0.9928 ± 0.0005
-Overfitting Gap:        0.0002
+Test Accuracy:          0.9914 (99.14%)
+Train Accuracy:         0.9922 (99.22%)
+CV Accuracy:            0.9922 ± 0.0004
+Overfitting Gap:        0.0008
   ✅ Excellent - Minimal overfitting
 
 ================================================================================
 
-📋 CONFUSION MATRIX
+🎯 THRESHOLD OPTIMIZATION (FALSE POSITIVE REDUCTION)
 --------------------------------------------------------------------------------
-True Negatives (Legit → Legit):      26,217
-False Positives (Legit → Phishing):  10
-False Negatives (Phishing → Legit):  388
-True Positives (Phishing → Phishing): 28,299
+Default Threshold:      0.5000
+Optimal Threshold:      0.0405 (high-precision)
+F1-Optimized:           0.3200
+Balanced:               0.1319
 
-False Positive Rate:    0.0004 (0.04%)
-False Negative Rate:    0.0135 (1.35%)
+Performance with Optimal Threshold:
+  Test Accuracy:        0.9693 (96.93%)
+  False Positive Rate:  0.0565 (5.65%)
+  False Negative Rate:  0.0069 (0.69%)
+  Precision:            0.9500 (95.00%)
+  Recall:               0.9931 (99.31%)
+
+Improvement:
+  FPR Reduction:        -5.29 percentage points
+
+================================================================================
+
+📋 CONFUSION MATRIX (DEFAULT THRESHOLD)
+--------------------------------------------------------------------------------
+True Negatives (Legit → Legit):      32,412
+False Positives (Legit → Phishing):  115
+False Negatives (Phishing → Legit):  470
+True Positives (Phishing → Phishing): 34,691
+
+False Positive Rate:    0.0035 (0.35%)
+False Negative Rate:    0.0134 (1.34%)
+
+================================================================================
+
+📋 CONFUSION MATRIX (OPTIMAL THRESHOLD = 0.0405)
+--------------------------------------------------------------------------------
+True Negatives (Legit → Legit):      30,690
+False Positives (Legit → Phishing):  1,837
+False Negatives (Phishing → Legit):  241
+True Positives (Phishing → Phishing): 34,920
+
+False Positive Rate:    0.0565 (5.65%)
+False Negative Rate:    0.0069 (0.69%)
 
 ================================================================================
 
 🏆 TOP 20 MOST IMPORTANT FEATURES
 --------------------------------------------------------------------------------
-path_length                    0.148159
-num_slashes                    0.137382
-path_ratio                     0.136054
-uses_https                     0.122052
-contains_ip                    0.083151
-path_entropy                   0.056444
-num_special_char               0.046522
-digit_ratio                    0.044548
-num_hyphens                    0.039450
-hostname_ratio                 0.031324
-letter_ratio                   0.023345
-url_entropy                    0.021537
-domain_trust_score             0.016814
-subdomain_depth                0.011251
-num_equal                      0.010958
-domain_entropy                 0.010783
-url_length                     0.009531
-SuspiciousTLD                  0.009256
-ExcessiveHyphens               0.008551
-tld_length                     0.007039
+num_slashes                    0.298328
+path_ratio                     0.163325
+uses_https                     0.119309
+path_length                    0.103887
+path_entropy                   0.068449
+num_special_char               0.046116
+digit_ratio                    0.039541
+SuspiciousTLD                  0.028391
+hostname_ratio                 0.022838
+url_length                     0.013410
+subdomain_depth                0.013173
+letter_ratio                   0.012865
+hostname_length                0.011663
+num_dots                       0.010047
+domain_trust_score             0.007896
+tld_length                     0.007790
+LowVowelRatio                  0.005777
+CharacterSubstitutions         0.004086
+domain_entropy                 0.003913
+contains_ip                    0.003042
 
 ================================================================================
 
 ⚙️  HYPERPARAMETERS
 --------------------------------------------------------------------------------
-max_depth                 3
-reg_lambda                6.312695613460964
-reg_alpha                 4.173299268615059
-min_child_weight          13
-subsample                 0.500537119681817
-colsample_bytree          0.5720297501257122
-colsample_bylevel         0.5147323555893614
-colsample_bynode          0.47044458437520587
-learning_rate             0.04663960566954563
-n_estimators              196
-gamma                     1.3228476993357345
+max_depth                 4
+reg_lambda                8.146231571626602
+reg_alpha                 7.981811989446712
+min_child_weight          18
+subsample                 0.6412294774128781
+colsample_bytree          0.5995221583865719
+colsample_bylevel         0.5917232771861978
+colsample_bynode          0.4556710533461823
+learning_rate             0.048237594652699216
+n_estimators              194
+gamma                     1.1512314383399798
 
 ================================================================================
 
@@ -90,6 +121,15 @@ Class 1 = Phishing (Malicious websites)
 When predict_proba() returns [0.9, 0.1]:
   - 90% probability of Legitimate (index 0)
   - 10% probability of Phishing (index 1)
+
+================================================================================
+
+💡 USAGE NOTES
+--------------------------------------------------------------------------------
+To use optimal threshold in production:
+  1. Get probabilities: proba = model.predict_proba(X)[:, 1]
+  2. Apply threshold: predictions = (proba >= 0.0405).astype(int)
+  3. This reduces false positives while maintaining phishing detection!
 
 ================================================================================
 

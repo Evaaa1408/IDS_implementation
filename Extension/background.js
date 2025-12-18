@@ -5,6 +5,7 @@ const API_ENDPOINT = "http://localhost:5000/predict";
 const checkedTabs = new Map(); 
 const pendingChecks = new Map(); // Track ongoing checks
 const checkResults = new Map(); // Store check results for notifications
+const bypassedUrls = new Set(); 
 
 // ========================================================
 // PHASE 1: PRE-NAVIGATION CHECK - Block dangerous sites FAST
@@ -26,6 +27,12 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
         // Skip chrome internal
         if (domain.startsWith('chrome')) return;
         
+        // Check if user explicitly chose to proceed to this URL
+        if (bypassedUrls.has(url)) {
+            console.log("⏭️ Bypassing check - user chose to proceed:", url);
+            return;
+        }
+        
         // Skip search engines and common safe sites
         const skipDomains = [
             'google.com', 'www.google.com', 'google.com.my', 'google.co.uk',
@@ -34,6 +41,12 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
             'yahoo.com', 'www.yahoo.com', 'search.yahoo.com',
             'baidu.com', 'www.baidu.com',
             'yandex.com', 'www.yandex.com',
+            'wikipedia.org', 'en.wikipedia.org', 'www.wikipedia.org',
+            'github.com', 'www.github.com',
+            'stackoverflow.com', 'www.stackoverflow.com',
+            'reddit.com', 'www.reddit.com',
+            'twitter.com', 'www.twitter.com', 'x.com', 'www.x.com',
+            'youtube.com', 'www.youtube.com',
             'shopee.com.my', 'shopee.sg', 'shopee.ph', 'shopee.co.id',
             'www.shopee.com.my', 'www.shopee.sg',
             'lazada.com.my', 'lazada.sg', 'lazada.co.th',
@@ -209,69 +222,75 @@ async function fastSecurityCheck(url, tabId) {
         console.log("🛡️ Pre-navigation check:", url);
         
         // IMMEDIATELY inject "Checking..." overlay to prevent page from showing
-        setTimeout(() => {
-            chrome.scripting.executeScript({
-                target: { tabId: tabId },
-                func: () => {
-                    // Block entire page with semi-transparent overlay + small popup
-                    const overlay = document.createElement('div');
-                    overlay.id = 'phishing-check-overlay';
-                    overlay.innerHTML = `
-                        <style>
-                            #phishing-check-overlay {
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                width: 100%;
-                                height: 100%;
-                                background: rgba(0, 0, 0, 0.85);
-                                backdrop-filter: blur(10px);
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                z-index: 999999;
-                                font-family: -apple-system, system-ui, sans-serif;
-                            }
-                            .check-card {
-                                background: white;
-                                border-radius: 16px;
-                                padding: 30px 40px;
-                                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                                text-align: center;
-                                max-width: 320px;
-                            }
-                            .spinner {
-                                width: 40px;
-                                height: 40px;
-                                margin: 0 auto 20px;
-                                border: 3px solid #e5e7eb;
-                                border-top-color: #3b82f6;
-                                border-radius: 50%;
-                                animation: spin 0.8s linear infinite;
-                            }
-                            @keyframes spin { to { transform: rotate(360deg); } }
-                            .check-card h3 {
-                                margin: 0 0 10px 0;
-                                font-size: 18px;
-                                font-weight: 600;
-                                color: #1f2937;
-                            }
-                            .check-card p {
-                                margin: 0;
-                                font-size: 14px;
-                                color: #6b7280;
-                            }
-                        </style>
-                        <div class="check-card">
-                            <div class="spinner"></div>
-                            <h3>🔍 Checking Security</h3>
-                            <p>Analyzing for threats...</p>
-                        </div>
-                    `;
-                    document.body.appendChild(overlay);
+        chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            func: () => {
+                // Block entire page with semi-transparent overlay + small popup
+                const overlay = document.createElement('div');
+                overlay.id = 'phishing-check-overlay';
+                overlay.innerHTML = `
+                    <style>
+                        #phishing-check-overlay {
+                            position: fixed !important;
+                            top: 0 !important;
+                            left: 0 !important;
+                            width: 100% !important;
+                            height: 100% !important;
+                            background: rgba(0, 0, 0, 0.85) !important;
+                            backdrop-filter: blur(10px) !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            z-index: 2147483647 !important;
+                            font-family: -apple-system, system-ui, sans-serif !important;
+                        }
+                        .check-card {
+                            background: white !important;
+                            border-radius: 16px !important;
+                            padding: 30px 40px !important;
+                            box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+                            text-align: center !important;
+                            max-width: 320px !important;
+                        }
+                        .spinner {
+                            width: 40px !important;
+                            height: 40px !important;
+                            margin: 0 auto 20px !important;
+                            border: 3px solid #e5e7eb !important;
+                            border-top-color: #3b82f6 !important;
+                            border-radius: 50% !important;
+                            animation: spin 0.8s linear infinite !important;
+                        }
+                        @keyframes spin { to { transform: rotate(360deg); } }
+                        .check-card h3 {
+                            margin: 0 0 10px 0 !important;
+                            font-size: 18px !important;
+                            font-weight: 600 !important;
+                            color: #1f2937 !important;
+                        }
+                        .check-card p {
+                            margin: 0 !important;
+                            font-size: 14px !important;
+                            color: #6b7280 !important;
+                        }
+                    </style>
+                    <div class="check-card">
+                        <div class="spinner"></div>
+                        <h3>🔍 Checking Security</h3>
+                        <p>Analyzing for threats...</p>
+                    </div>
+                `;
+                // Inject ASAP - use documentElement if body not ready
+                const target = document.body || document.documentElement;
+                target.appendChild(overlay);
+                
+                // Also hide page content temporarily
+                if (document.body) {
+                    document.body.style.visibility = 'hidden';
                 }
-            }).catch(err => console.error("Failed to inject checking overlay:", err));
-        }, 10); // Very fast injection
+            },
+            world: 'MAIN'
+        }).catch(err => console.error("Failed to inject checking overlay:", err));
         
         // Fast URL-only check
         const response = await fetch(API_ENDPOINT, {
@@ -325,13 +344,17 @@ async function fastSecurityCheck(url, tabId) {
             chrome.action.setBadgeText({ text: "✓", tabId });
             chrome.action.setBadgeBackgroundColor({ color: "#10B981", tabId });
             
-            // Remove the checking overlay
+            // Remove the checking overlay and restore visibility
             setTimeout(() => {
                 chrome.scripting.executeScript({
                     target: { tabId: tabId },
                     func: () => {
                         const overlay = document.getElementById('phishing-check-overlay');
                         if (overlay) overlay.remove();
+                        // Restore page visibility
+                        if (document.body) {
+                            document.body.style.visibility = 'visible';
+                        }
                     }
                 }).catch(err => console.log("Overlay already removed:", err));
             }, 100);
@@ -482,6 +505,24 @@ function showErrorBadge(tabId) {
     chrome.action.setBadgeText({ text: "ERR", tabId: tabId });
     chrome.action.setBadgeBackgroundColor({ color: "#6c757d", tabId: tabId });
 }
+
+// Listen for bypass requests
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'BYPASS_URL') {
+        const url = message.url;
+        console.log("✅ Adding URL to bypass list:", url);
+        bypassedUrls.add(url);
+        
+        // Auto-remove from bypass after 1 minute (safety measure)
+        setTimeout(() => {
+            bypassedUrls.delete(url);
+            console.log("⏰ Removed URL from bypass list:", url);
+        }, 1 * 60 * 1000);
+        
+        sendResponse({ success: true });
+    }
+    return true; 
+});
 
 // Extension loaded
 chrome.runtime.onInstalled.addListener(() => {

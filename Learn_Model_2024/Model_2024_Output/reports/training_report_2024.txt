@@ -1,0 +1,120 @@
+==========================================================================================
+ MODEL 2024 - TRAINING REPORT WITH DETAILED ANALYSIS
+==========================================================================================
+
+Generated: 2025-12-18 16:41:42
+
+==========================================================================================
+
+📊 DATASET INFORMATION
+------------------------------------------------------------------------------------------
+Total Samples:          450,176
+Training Samples:       360,140
+Test Samples:           90,036
+Number of Features:     34
+
+Label Distribution:
+  Legitimate:           345,738 (76.8%)
+  Phishing:             104,438 (23.2%)
+
+Class Imbalance:
+  Ratio: 3.31:1 (Legitimate:Phishing)
+  ✅ Handled with scale_pos_weight=3.31
+
+==========================================================================================
+
+🎯 MODEL PERFORMANCE
+------------------------------------------------------------------------------------------
+Test Accuracy:          0.9953 (99.53%)
+Train Accuracy:         0.9967 (99.67%)
+CV Accuracy:            0.9958 ± 0.0003
+Overfitting Gap:        0.0014
+  ✅ Excellent - Minimal overfitting
+
+==========================================================================================
+
+📋 DETAILED METRICS
+------------------------------------------------------------------------------------------
+False Positive Rate:    0.0007 (0.07%)
+  → 47 legitimate URLs wrongly flagged as phishing
+False Negative Rate:    0.0178 (1.78%)
+  → 372 phishing URLs missed (flagged as safe)
+Precision:              0.9977 (99.77%)
+  → When model says 'phishing', it's correct 99.8% of the time
+Recall:                 0.9822 (98.22%)
+  → Model catches 98.2% of all phishing URLs
+
+==========================================================================================
+
+📋 CONFUSION MATRIX
+------------------------------------------------------------------------------------------
+True Negatives (Legit → Legit):      69,101
+False Positives (Legit → Phishing):  47
+False Negatives (Phishing → Legit):  372
+True Positives (Phishing → Phishing): 20,516
+
+==========================================================================================
+
+🏆 TOP 20 MOST IMPORTANT FEATURES
+------------------------------------------------------------------------------------------
+
+These features are most important for identifying phishing:
+uses_https                     0.859069
+subdomain_depth                0.054105
+domain_trust_score             0.024628
+num_at                         0.012196
+suspicious_keyword_flag        0.008691
+tld_length                     0.008219
+is_slug_like                   0.003868
+SuspiciousTLD                  0.003078
+num_equal                      0.003056
+num_dots                       0.002489
+TyposquattingScore             0.002218
+domain_entropy                 0.001841
+hostname_length                0.001479
+CharacterSubstitutions         0.001465
+num_slashes                    0.001412
+num_special_char               0.001391
+digit_ratio                    0.001320
+url_length                     0.001255
+ExcessiveHyphens               0.001146
+num_hyphens                    0.001073
+
+==========================================================================================
+
+💡 UNDERSTANDING THE RESULTS
+------------------------------------------------------------------------------------------
+
+❓ Why is phishing percentage different in predictions?
+   Dataset has 104438 phishing (23.2%)
+   Model predicted 20563 as phishing in test set
+   Actual phishing in test: 20888
+
+   This difference shows:
+   • False Positives: Model too aggressive → 47 safe URLs blocked
+   • False Negatives: Model too lenient → 372 phishing URLs missed
+
+❓ How does the model identify phishing?
+   The model learned patterns from 450,176 URLs:
+   • Analyzed 34 URL features (length, characters, structure)
+   • Most important: uses_https
+   • Uses XGBoost decision trees to classify
+   • Balanced classes using scale_pos_weight=3.31
+
+==========================================================================================
+
+⚙️  HYPERPARAMETERS
+------------------------------------------------------------------------------------------
+max_depth                 8
+reg_lambda                1.9551074134679356
+reg_alpha                 1.6791459399257915
+min_child_weight          8
+subsample                 0.8962850195614953
+colsample_bytree          0.680634252332814
+learning_rate             0.09645027802352477
+n_estimators              185
+
+==========================================================================================
+
+✅ TRAINING COMPLETED SUCCESSFULLY
+==========================================================================================

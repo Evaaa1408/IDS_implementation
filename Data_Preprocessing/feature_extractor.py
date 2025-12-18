@@ -343,9 +343,9 @@ class URLFeatureExtractor:
         # ============================================================
         # BASIC FEATURES (23) - Keep for compatibility
         # ============================================================
-        url_length = len(url)
+        url_length = min(len(url), 200) 
         hostname_length = len(hostname)
-        path_length = len(path)
+        path_length = min(len(path), 150)
         num_dots = url.count(".")
         num_slashes = url.count("/")
         num_hyphens = url.count("-")
@@ -473,8 +473,54 @@ class URLFeatureExtractor:
         # Suspicious TLD
         features['SuspiciousTLD'] = 1 if tld in self.suspicious_tlds else 0
         
-        # Excessive hyphens
-        features['ExcessiveHyphens'] = 1 if num_hyphens >= 3 else 0
+       # ========================================================
+        # FIXED: Context-aware hyphen detection
+        # ========================================================
+        
+        # Count hyphens in different parts
+        hyphens_in_domain = domain_name.count("-")
+        hyphens_in_path = path.count("-")
+        
+        # Context-aware excessive hyphens
+        if hyphens_in_domain >= 3:
+            # Multiple hyphens in domain = suspicious
+            excessive_hyphens = 1
+        elif hyphens_in_path >= 5:
+            # Many hyphens in path - check if title slug
+            if path_analysis['has_slug_pattern'] or path_analysis['word_ratio'] > 0.6:
+                excessive_hyphens = 0  # Title slug (legitimate)
+            else:
+                excessive_hyphens = 1  # Random hyphens (suspicious)
+        else:
+            excessive_hyphens = 0
+        
+        features['ExcessiveHyphens'] = excessive_hyphens
+        
+        # Hyphen legitimacy score
+        if hyphens_in_path > 0 and len(path) > 10:
+            path_words = re.findall(r'[a-zA-Z]{2,}', path)
+            if len(path_words) > 0:
+                hyphen_word_ratio = hyphens_in_path / len(path_words)
+                if hyphen_word_ratio < 1.5 and path_analysis['word_ratio'] > 0.5:
+                    hyphen_legitimacy = 1  # Title slug
+                else:
+                    hyphen_legitimacy = -1  # Suspicious
+            else:
+                hyphen_legitimacy = -1
+        else:
+            hyphen_legitimacy = 0
+        
+        features['hyphen_legitimacy'] = hyphen_legitimacy
+        
+        # NEW: Title slug detection
+        title_slug_detected = 0
+        if hyphens_in_path >= 5:
+            segments = [s for s in path.lower().split('-') if len(s) >= 3 and s.isalpha()]
+            readable_segments = [s for s in segments if s in self.common_words]
+            if len(readable_segments) >= 5:
+                title_slug_detected = 1
+        
+        features['title_slug_detected'] = title_slug_detected
         
         # Number-letter mixing in domain
         mixed_pattern = 0
@@ -513,6 +559,37 @@ class URLFeatureExtractor:
         features['has_slug_pattern'] = int(path_analysis['has_slug_pattern'])
         features['path_segment_count'] = min(path_analysis['segment_count'], 10)
         features['common_query_params'] = min(query_analysis['common_param_count'], 5)
+        
+        return features
+
+        # ========================================================
+        #LONG LEGITIMATE URL COMPENSATION
+        # ========================================================
+        long_url_with_structure = 0
+        if url_length > 100:
+            # Check if it has legitimate article structure
+            if (path_analysis['has_slug_pattern'] or 
+                path_analysis['word_ratio'] > 0.6):
+                long_url_with_structure = 1  # Long but structured
+        features['long_url_with_structure'] = long_url_with_structure
+        
+        # Detect common article/blog URL patterns
+        article_indicators = [
+            '/blog/', '/blogs/', '/article/', '/articles/',
+            '/news/', '/post/', '/story/', '/stories/',
+            '-most-', '-best-', '-top-', '-how-to-',
+            '/daily-', '/weekly-', '/monthly-'
+        ]
+        has_article_pattern = int(any(indicator in url.lower() for indicator in article_indicators))
+        features['has_article_pattern'] = has_article_pattern
+        
+        # Date Patterns in URL
+        has_date_pattern = int(bool(
+            re.search(r'/\d{4}[/-]\d{1,2}[/-]\d{1,2}/', url) or  # /2024/01/15/
+            re.search(r'/\d{8}/', url) or                         # /20240115/
+            re.search(r'\d{6,8}(?:\.html?)?$', path)             # filename with date
+        ))
+        features['has_date_pattern'] = has_date_pattern
         
         return features
 

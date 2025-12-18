@@ -2,7 +2,7 @@
  MODEL 2024 - TRAINING REPORT WITH DETAILED ANALYSIS
 ==========================================================================================
 
-Generated: 2025-12-18 16:41:42
+Generated: 2025-12-19 02:43:35
 
 ==========================================================================================
 
@@ -25,33 +25,33 @@ Class Imbalance:
 
 🎯 MODEL PERFORMANCE
 ------------------------------------------------------------------------------------------
-Test Accuracy:          0.9953 (99.53%)
-Train Accuracy:         0.9967 (99.67%)
-CV Accuracy:            0.9958 ± 0.0003
-Overfitting Gap:        0.0014
+Test Accuracy:          0.9955 (99.55%)
+Train Accuracy:         0.9971 (99.71%)
+CV Accuracy:            0.9960 ± 0.0003
+Overfitting Gap:        0.0016
   ✅ Excellent - Minimal overfitting
 
 ==========================================================================================
 
 📋 DETAILED METRICS
 ------------------------------------------------------------------------------------------
-False Positive Rate:    0.0007 (0.07%)
-  → 47 legitimate URLs wrongly flagged as phishing
-False Negative Rate:    0.0178 (1.78%)
-  → 372 phishing URLs missed (flagged as safe)
-Precision:              0.9977 (99.77%)
-  → When model says 'phishing', it's correct 99.8% of the time
-Recall:                 0.9822 (98.22%)
-  → Model catches 98.2% of all phishing URLs
+False Positive Rate:    0.0008 (0.08%)
+  → 53 legitimate URLs wrongly flagged as phishing
+False Negative Rate:    0.0169 (1.69%)
+  → 353 phishing URLs missed (flagged as safe)
+Precision:              0.9974 (99.74%)
+  → When model says 'phishing', it's correct 99.7% of the time
+Recall:                 0.9831 (98.31%)
+  → Model catches 98.3% of all phishing URLs
 
 ==========================================================================================
 
 📋 CONFUSION MATRIX
 ------------------------------------------------------------------------------------------
-True Negatives (Legit → Legit):      69,101
-False Positives (Legit → Phishing):  47
-False Negatives (Phishing → Legit):  372
-True Positives (Phishing → Phishing): 20,516
+True Negatives (Legit → Legit):      69,095
+False Positives (Legit → Phishing):  53
+False Negatives (Phishing → Legit):  353
+True Positives (Phishing → Phishing): 20,535
 
 ==========================================================================================
 
@@ -59,26 +59,26 @@ True Positives (Phishing → Phishing): 20,516
 ------------------------------------------------------------------------------------------
 
 These features are most important for identifying phishing:
-uses_https                     0.859069
-subdomain_depth                0.054105
-domain_trust_score             0.024628
-num_at                         0.012196
-suspicious_keyword_flag        0.008691
-tld_length                     0.008219
-is_slug_like                   0.003868
-SuspiciousTLD                  0.003078
-num_equal                      0.003056
-num_dots                       0.002489
-TyposquattingScore             0.002218
-domain_entropy                 0.001841
-hostname_length                0.001479
-CharacterSubstitutions         0.001465
-num_slashes                    0.001412
-num_special_char               0.001391
-digit_ratio                    0.001320
-url_length                     0.001255
-ExcessiveHyphens               0.001146
-num_hyphens                    0.001073
+uses_https                     0.886272
+subdomain_depth                0.047907
+domain_trust_score             0.022178
+suspicious_keyword_flag        0.008227
+is_slug_like                   0.003732
+num_at                         0.003666
+SuspiciousTLD                  0.003131
+tld_length                     0.002957
+num_equal                      0.002671
+num_dots                       0.001947
+contains_ip                    0.001831
+num_slashes                    0.001469
+TyposquattingScore             0.001354
+digit_ratio                    0.001327
+num_hyphens                    0.001255
+domain_entropy                 0.001182
+CharacterSubstitutions         0.001121
+hostname_length                0.001046
+num_special_char               0.000891
+url_length                     0.000879
 
 ==========================================================================================
 
@@ -87,12 +87,12 @@ num_hyphens                    0.001073
 
 ❓ Why is phishing percentage different in predictions?
    Dataset has 104438 phishing (23.2%)
-   Model predicted 20563 as phishing in test set
+   Model predicted 20588 as phishing in test set
    Actual phishing in test: 20888
 
    This difference shows:
-   • False Positives: Model too aggressive → 47 safe URLs blocked
-   • False Negatives: Model too lenient → 372 phishing URLs missed
+   • False Positives: Model too aggressive → 53 safe URLs blocked
+   • False Negatives: Model too lenient → 353 phishing URLs missed
 
 ❓ How does the model identify phishing?
    The model learned patterns from 450,176 URLs:
@@ -105,14 +105,14 @@ num_hyphens                    0.001073
 
 ⚙️  HYPERPARAMETERS
 ------------------------------------------------------------------------------------------
-max_depth                 8
-reg_lambda                1.9551074134679356
-reg_alpha                 1.6791459399257915
-min_child_weight          8
-subsample                 0.8962850195614953
-colsample_bytree          0.680634252332814
-learning_rate             0.09645027802352477
-n_estimators              185
+max_depth                 7
+reg_lambda                1.0678262312984952
+reg_alpha                 3.3966084465392954
+min_child_weight          4
+subsample                 0.8879847274222424
+colsample_bytree          0.6608668346040321
+learning_rate             0.0981636409011253
+n_estimators              299
 
 ==========================================================================================
 

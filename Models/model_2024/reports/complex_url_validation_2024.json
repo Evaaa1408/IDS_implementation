@@ -1,0 +1,102 @@
+{
+    "test_date": "2025-12-19 05:15:45",
+    "total_complex_urls": 15,
+    "false_positives_default": 4,
+    "false_positives_optimal": 6,
+    "false_positive_rate_default": 0.26666666666666666,
+    "false_positive_rate_optimal": 0.4,
+    "improvement": -2,
+    "threshold_used": 0.040840473026037216,
+    "detailed_results": [
+        {
+            "url": "https://www.britannica.com/biography/Che-Guevara",
+            "probability": 0.0005583072197623551,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://plato.stanford.edu/entries/ethics-ai/",
+            "probability": 0.013203609734773636,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:systems-of-equations",
+            "probability": 0.03660393878817558,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://scholar.google.com/scholar?hl=en&q=phishing+detection",
+            "probability": 0.0043383389711380005,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://docs.google.com/document/d/1A9f8KJ9P2wQxU4Y/edit",
+            "probability": 0.008951498195528984,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow",
+            "probability": 0.001658367458730936,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+            "probability": 0.012608839198946953,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://github.com/openai/gpt-4/blob/main/system_card.md",
+            "probability": 0.967343807220459,
+            "predicted_default": 1,
+            "predicted_optimal": 1
+        },
+        {
+            "url": "https://auth0.com/docs/flows/authorization-code-flow",
+            "probability": 0.9617222547531128,
+            "predicted_default": 1,
+            "predicted_optimal": 1
+        },
+        {
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "probability": 0.0004848206590395421,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://medium.com/@user/how-machine-learning-detects-phishing-8f92a9c12",
+            "probability": 0.9805746078491211,
+            "predicted_default": 1,
+            "predicted_optimal": 1
+        },
+        {
+            "url": "https://www.reddit.com/r/netsec/comments/15f9k2m/phishing_detection_models/",
+            "probability": 0.0023913737386465073,
+            "predicted_default": 0,
+            "predicted_optimal": 0
+        },
+        {
+            "url": "https://vimeo.com/76979871",
+            "probability": 0.9839179515838623,
+            "predicted_default": 1,
+            "predicted_optimal": 1
+        },
+        {
+            "url": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+            "probability": 0.1004604771733284,
+            "predicted_default": 0,
+            "predicted_optimal": 1
+        },
+        {
+            "url": "https://accounts.google.com/o/oauth2/v2/auth",
+            "probability": 0.11677508056163788,
+            "predicted_default": 0,
+            "predicted_optimal": 1
+        }
+    ]
+}

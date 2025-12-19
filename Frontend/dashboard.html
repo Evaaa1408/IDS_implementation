@@ -3,90 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phishing Detection | Admin Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/dashboard.css">
+    <title>Phishing Detection Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <!-- Light Mode: Sun & Sky -->
+        <div class="sun"></div>
+        <div class="clouds">
+            <div class="cloud cloud1"></div>
+            <div class="cloud cloud2"></div>
+            <div class="cloud cloud3"></div>
+        </div>
+        
+        <!-- Dark Mode: Moon & Stars -->
+        <div class="moon"></div>
+        <div class="stars">
+            <div class="star" style="top: 10%; left: 15%;"></div>
+            <div class="star" style="top: 20%; left: 30%;"></div>
+            <div class="star" style="top: 25%; left: 70%;"></div>
+            <div class="star" style="top: 40%; left: 85%;"></div>
+            <div class="star" style="top: 60%; left: 20%;"></div>
+            <div class="star" style="top: 70%; left: 60%;"></div>
+            <div class="star" style="top: 15%; left: 90%;"></div>
+            <div class="star" style="top: 45%; left: 50%;"></div>
+            <div class="star" style="top: 80%; left: 40%;"></div>
+            <div class="star" style="top:  35%; left: 10%;"></div>
+            <div class="star" style="top: 50%; left: 75%;"></div>
+            <div class="star" style="top: 65%; left: 35%;"></div>
+            <div class="star" style="top: 85%; left: 80%;"></div>
+            <div class="star" style="top: 12%; left: 55%;"></div>
+            <div class="star" style="top: 55%; left: 95%;"></div>
+        </div>
+    </div>
 
+    <!-- Main Container -->
     <div class="container">
         <!-- Header -->
-        <header>
-            <div class="logo">🛡️ SecureEye Admin</div>
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <div id="system-status">
-                    <span class="status-badge status-idle" id="status-light"></span>
-                    <span id="status-text">System Idle</span>
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">🛡️</div>
+                    <div class="logo-text">
+                        <h1 class="animate-slide-in">Phishing Detection</h1>
+                        <p class="subtitle animate-fade-in">Security Dashboard</p>
+                    </div>
                 </div>
-                <button class="theme-toggle" onclick="toggleTheme()">
-                    <span id="theme-icon">☀️</span>
+                
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <span class="theme-icon sun-icon">☀️</span>
+                    <span class="theme-icon moon-icon">🌙</span>
                 </button>
             </div>
         </header>
 
-        <!-- Control Panel -->
-        <div class="control-panel">
-            <!-- Training Controls -->
-            <div class="card">
-                <h2>🧠 Neural Training Control</h2>
-                <div style="display: flex; gap: 1rem;">
-                    <div style="flex: 1;">
-                        <label style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Retrain Frequency</label>
-                        <select id="frequency-select">
-                            <option value="manual">Manual</option>
-                            <option value="6d">Every 6 Days</option>
-                            <option value="14d">Every 2 Weeks</option>
-                            <option value="30d">Every Month</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1; display: flex; align-items: flex-end;">
-                        <button class="btn-primary" onclick="triggerRetrain()" id="train-btn">
-                            🔥 Start Retraining
-                        </button>
-                    </div>
+        <!-- Statistics Cards -->
+        <div class="stats-container">
+            <div class="stat-card animate-scale-in" style="animation-delay: 0.1s">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    📊
                 </div>
-                <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
-                    Last trained: <span id="last-trained-date">2025-12-10 05:00</span>
-                </p>
+                <div class="stat-content">
+                    <h3 class="stat-value" id="totalBlocked">0</h3>
+                    <p class="stat-label">Total Detections</p>
+                </div>
             </div>
 
-            <!-- Stats -->
-            <div class="card" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                <h3 style="color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase;">Pending Threats</h3>
-                <div style="font-size: 3rem; font-weight: 700; color: var(--accent-color);" id="pending-count">0</div>
-                <div style="font-size: 0.9rem; color: var(--text-secondary);">Requiring Review</div>
+            <div class="stat-card animate-scale-in" style="animation-delay: 0.2s">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    🚫
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value" id="highRisk">0</h3>
+                    <p class="stat-label">Blocked Sites</p>
+                </div>
+            </div>
+
+            <div class="stat-card animate-scale-in" style="animation-delay: 0.3s">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                    ⚠️
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value" id="mediumRisk">0</h3>
+                    <p class="stat-label">Warnings</p>
+                </div>
+            </div>
+
+            <div class="stat-card animate-scale-in" style="animation-delay: 0.4s">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);">
+                    🔥
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value" id="falsePositiveCount">0</h3>
+                    <p class="stat-label">False Positives</p>
+                </div>
+            </div>
+
+            <div class="stat-card animate-scale-in" style="animation-delay: 0.5s">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                    📅
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value" id="todayCount">0</h3>
+                    <p class="stat-label">Today</p>
+                </div>
             </div>
         </div>
 
-        <!-- Malicious Log Table -->
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2>🚨 Malicious Traffic Log</h2>
-                <button class="theme-toggle" onclick="fetchLogs()">🔄 Refresh</button>
+        <!-- Filters & Search -->
+        <div class="controls-section animate-slide-up" style="animation-delay: 0.6s">
+            <div class="controls-row">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search by URL..." />
+                </div>
+                
+                <!-- Time Range Button with Calendar Icon -->
+                <div class="time-range-button" id="timeRangeButton">
+                    <span class="calendar-icon-btn">📅</span>
+                    <span class="time-range-text" id="timeRangeText">All Time</span>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
             </div>
             
-            <div class="table-container">
-                <table id="log-table">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="Blocked">Blocked</button>
+                <button class="filter-btn" data-filter="Warned">Warned</button>
+                <button class="filter-btn" data-filter="FalsePositives">False Positives</button>
+            </div>
+        </div>
+
+        <!-- Enhanced Date Picker Modal -->
+        <div id="datePickerModal" class="date-picker-modal" style="display: none;">
+            <div class="date-picker-overlay" onclick="closeDatePicker()"></div>
+            <div class="date-picker-content">
+                <div class="date-picker-header">
+                    <h3>📅 Select Time Range</h3>
+                    <button class="close-picker" onclick="closeDatePicker()">×</button>
+                </div>
+                
+                <!-- Tabs for Date/Month/Year -->
+                <div class="date-picker-tabs">
+                    <button class="tab-btn active" data-tab="date" onclick="switchTab('date')">📅 Date</button>
+                    <button class="tab-btn" data-tab="month" onclick="switchTab('month')">📆 Month</button>
+                    <button class="tab-btn" data-tab="year" onclick="switchTab('year')">🗓️ Year</button>
+                </div>
+                
+                <!-- Tab Contents -->
+                <div class="tab-content active" id="dateTab">
+                    <label class="input-label">Select a specific date</label>
+                    <input type="date" id="customDateInput" class="custom-date-native">
+                </div>
+                
+                <div class="tab-content" id="monthTab">
+                    <label class="input-label">Select a month</label>
+                    <select id="customMonthInput" class="custom-date-native">
+                        <option value="">Choose month...</option>
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                </div>
+                
+                <div class="tab-content" id="yearTab">
+                    <label class="input-label">Select a year</label>
+                    <select id="customYearInput" class="custom-date-native">
+                        <option value="">Choose year...</option>
+                    </select>
+                </div>
+                
+                <div class="date-picker-actions">
+                    <button class="date-btn-cancel" onclick="closeDatePicker()">Cancel</button>
+                    <button class="date-btn-apply" onclick="applyCustomDate()">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- False Positive Confirmation Modal -->
+        <div id="fpModal" class="fp-modal" style="display: none;">
+            <div class="fp-modal-overlay" onclick="closeFPModal()"></div>
+            <div class="fp-modal-content">
+                <div class="fp-modal-header">
+                    <span class="fp-modal-icon">⚠️</span>
+                    <h3>Report False Positive</h3>
+                </div>
+                <div class="fp-modal-body">
+                    <p class="fp-modal-url" id="fpModalUrl"></p>
+                    <p class="fp-modal-text">Mark this as a false positive?</p>
+                </div>
+                <div class="fp-modal-actions">
+                    <button class="fp-btn-cancel-modal" onclick="closeFPModal()">Cancel</button>
+                    <button class="fp-btn-confirm-modal" onclick="confirmFalsePositive()">Yes, Report</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-container animate-slide-up" style="animation-delay: 0.6s">
+            <div class="table-header">
+                <h2>🔒 Detection Log</h2>
+                <button class="refresh-btn" id="refreshBtn">
+                    <span class="refresh-icon">🔄</span> Refresh
+                </button>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Time</th>
-                            <th>Detected URL</th>
-                            <th>Confidence</th>
+                            <th>Timestamp</th>
+                            <th>URL</th>
                             <th>Prediction</th>
-                            <th>Actions</th>
+                            <th>Risk Level</th>
+                            <th>Action</th>
+                            <th>Admin</th>
                         </tr>
                     </thead>
-                    <tbody id="log-body">
-                        <!-- Data will be injected here -->
+                    <tbody id="logTableBody">
+                        <!-- Data will be inserted here -->
                     </tbody>
                 </table>
-                <div id="empty-state" style="text-align: center; padding: 2rem; color: var(--text-secondary); display: none;">
-                    No pending threats found.
-                </div>
+            </div>
+            
+            <div class="table-footer">
+                <p id="tableInfo">Loading...</p>
             </div>
         </div>
     </div>
 
-    <script src="/dashboard.js"></script>
+    <script src="dashboard.js"></script>
 </body>
 </html>

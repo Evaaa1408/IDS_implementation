@@ -1,0 +1,28 @@
+{
+    "training_date": "2025-12-12 18:47:26",
+    "model_type": "Random Forest Classifier (Enhanced)",
+    "label_encoding": "0=Legitimate, 1=Phishing",
+    "n_estimators": 600,
+    "dataset": {
+        "total_samples": 235795,
+        "training_samples": 188636,
+        "test_samples": 47159,
+        "num_features": 28,
+        "label_distribution": {
+            "legitimate": 100945,
+            "phishing": 134850
+        }
+    },
+    "performance": {
+        "test_accuracy": 0.9977946945439895,
+        "train_accuracy": 0.9995016857863822,
+        "oob_score": 0.9978530079094129,
+        "overfitting_gap": 0.001706991242392708
+    },
+    "confusion_matrix": {
+        "true_negatives": 20116,
+        "false_positives": 73,
+        "false_negatives": 31,
+        "true_positives": 26939
+    }
+}

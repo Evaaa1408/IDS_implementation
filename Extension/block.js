@@ -3,10 +3,14 @@ const params = new URLSearchParams(window.location.search);
 const blockedUrl = params.get('url') || 'Unknown URL';
 const risk = params.get('risk') || '--';
 const level = params.get('level') || 'high';
+const urlProb = params.get('url_prob') || '--';
+const contentProb = params.get('content_prob') || '--';
 
 // Update page content
 document.getElementById('blocked-url').textContent = decodeURIComponent(blockedUrl);
 document.getElementById('risk-percent').textContent = risk + '%';
+document.getElementById('url-percent').textContent = urlProb + '%';
+document.getElementById('content-percent').textContent = contentProb + '%';
 
 // Adjust for warning level (yellow)
 if (level === 'medium') {

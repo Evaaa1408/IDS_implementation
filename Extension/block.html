@@ -1,110 +1,266 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Security Warning</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #f0f0f0;
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh; color: #1f2937;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            padding: 20px;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        color: #1f2937;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+          sans-serif;
+        padding: 20px;
+      }
+      /* Grey warning mode */
+      body.warning-mode {
+        background: #f0f0f0;
+      }
+      .container {
+        text-align: center;
+        max-width: 650px;
+        background: linear-gradient(
+          135deg,
+          rgba(252, 165, 165, 1) 0%,
+          rgba(248, 113, 113, 0.95) 100%
+        );
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 60px 50px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+      }
+      body.warning-mode .container {
+        background: linear-gradient(
+          135deg,
+          rgba(253, 230, 138, 1) 0%,
+          rgba(252, 211, 77, 0.95) 100%
+        );
+      }
+      .icon {
+        font-size: 80px;
+        margin-bottom: 25px;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
         }
-        /* Grey warning mode */
-        body.warning-mode {
-            background: #f0f0f0;
+        50% {
+          transform: scale(1.05);
         }
-        .container {
-            text-align: center;
-            max-width: 650px;
-            background: linear-gradient(135deg, rgba(252, 165, 165, 1) 0%, rgba(248, 113, 113, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 60px 50px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-        }
-        body.warning-mode .container {
-            background: linear-gradient(135deg, rgba(253, 230, 138, 1) 0%, rgba(252, 211, 77, 0.95) 100%);
-        }
-        .icon { font-size: 80px; margin-bottom: 25px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        h1 { font-size: 42px; margin-bottom: 16px; font-weight: 700; letter-spacing: -0.5px; color: #000000; }
-        .subtitle { font-size: 18px; margin-bottom: 30px; opacity: 1; line-height: 1.6; color: #000000; font-weight: 500; }
-        .url-box {
-            background: rgba(0, 0, 0, 0.08);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 14px;
-            color: #000000;
-            border: 1px solid rgba(220, 38, 38, 0.2);
-        }
-        .risk-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(127, 29, 29, 0.1) 100%);
-            padding: 20px 40px;
-            border-radius: 16px;
-            margin-bottom: 40px;
-            border: 2px solid rgba(220, 38, 38, 0.3);
-        }
-        body.warning-mode .risk-badge {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(180, 83, 9, 0.1) 100%);
-            border: 2px solid rgba(245, 158, 11, 0.3);
-        }
-        .risk-label { font-size: 13px; text-transform: uppercase; opacity: 1; letter-spacing: 1px; margin-bottom: 8px; color: #000000; font-weight: 600; }
-        body.warning-mode .risk-label { color: #000000; }
-        .risk-value { font-size: 48px; font-weight: 800; color: #000000; }
-        body.warning-mode .risk-value { color: #000000; }
-        .button-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; }
-        .button-group-secondary { display: flex; justify-content: center; }
-        button {
-            padding: 16px 32px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 160px;
-        }
-        button:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-        .btn-primary { background: #dc2626; color: white; }
-        body.warning-mode .btn-primary { background: #ea580c; color: white; }
-        .btn-secondary { background: transparent; color: #dc2626; border: 2px solid #dc2626; }
-        body.warning-mode .btn-secondary { color: #ea580c; border: 2px solid #ea580c; }
-        .btn-admin { 
-            background: rgba(59, 130, 246, 0.15); 
-            color: #1e40af; 
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            font-size: 14px;
-            padding: 12px 24px;
-            min-width: 140px;
-        }
+      }
+      h1 {
+        font-size: 42px;
+        margin-bottom: 16px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        color: #000000;
+      }
+      .subtitle {
+        font-size: 18px;
+        margin-bottom: 30px;
+        opacity: 1;
+        line-height: 1.6;
+        color: #000000;
+        font-weight: 500;
+      }
+      .url-box {
+        background: rgba(0, 0, 0, 0.08);
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 14px;
+        color: #000000;
+        border: 1px solid rgba(220, 38, 38, 0.2);
+      }
+      .risk-badge {
+        display: inline-block;
+        background: linear-gradient(
+          135deg,
+          rgba(220, 38, 38, 0.1) 0%,
+          rgba(127, 29, 29, 0.1) 100%
+        );
+        padding: 20px 40px;
+        border-radius: 16px;
+        margin-bottom: 40px;
+        border: 2px solid rgba(220, 38, 38, 0.3);
+      }
+      body.warning-mode .risk-badge {
+        background: linear-gradient(
+          135deg,
+          rgba(245, 158, 11, 0.1) 0%,
+          rgba(180, 83, 9, 0.1) 100%
+        );
+        border: 2px solid rgba(245, 158, 11, 0.3);
+      }
+      .risk-label {
+        font-size: 13px;
+        text-transform: uppercase;
+        opacity: 1;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        color: #000000;
+        font-weight: 600;
+      }
+      body.warning-mode .risk-label {
+        color: #000000;
+      }
+      .risk-value {
+        font-size: 48px;
+        font-weight: 800;
+        color: #000000;
+      }
+      body.warning-mode .risk-value {
+        color: #000000;
+      }
+      .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+      .button-group-secondary {
+        display: flex;
+        justify-content: center;
+      }
+      button {
+        padding: 16px 32px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 160px;
+      }
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+      .btn-primary {
+        background: #dc2626;
+        color: white;
+      }
+      body.warning-mode .btn-primary {
+        background: #ea580c;
+        color: white;
+      }
+      .btn-secondary {
+        background: transparent;
+        color: #dc2626;
+        border: 2px solid #dc2626;
+      }
+      body.warning-mode .btn-secondary {
+        color: #ea580c;
+        border: 2px solid #ea580c;
+      }
+      .btn-admin {
+        background: rgba(59, 130, 246, 0.15);
+        color: #1e40af;
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        font-size: 14px;
+        padding: 12px 24px;
+        min-width: 140px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="icon">🛡️</div>
-        <h1 id="title">PHISHING DETECTED</h1>
-        <p class="subtitle" id="subtitle">This website has been flagged as dangerously suspicious.<br>Proceeding may result in identity theft or data compromise.</p>
-        <div class="url-box" id="blocked-url">Loading...</div>
-        <div class="risk-badge">
-            <div class="risk-label">Threat Level</div>
-            <div class="risk-value" id="risk-percent">--</div>
+      <div class="icon">🛡️</div>
+      <h1 id="title">PHISHING DETECTED</h1>
+      <p class="subtitle" id="subtitle">
+        This website has been flagged as dangerously suspicious.<br />Proceeding
+        may result in identity theft or data compromise.
+      </p>
+      <div class="url-box" id="blocked-url">Loading...</div>
+      <div class="risk-badge">
+        <div class="risk-label">Threat Level</div>
+        <div class="risk-value" id="risk-percent">--</div>
+      </div>
+      <div
+        style="
+          display: flex;
+          gap: 20px;
+          justify-content: center;
+          margin-bottom: 30px;
+        "
+      >
+        <div
+          style="
+            background: rgba(0, 0, 0, 0.08);
+            padding: 15px 25px;
+            border-radius: 12px;
+            min-width: 140px;
+          "
+        >
+          <div
+            style="
+              font-size: 12px;
+              text-transform: uppercase;
+              opacity: 0.8;
+              margin-bottom: 5px;
+              color: #000000;
+              font-weight: 600;
+            "
+          >
+            URL Risk
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 700; color: #000000"
+            id="url-percent"
+          >
+            --
+          </div>
         </div>
-        <div class="button-group">
-            <button class="btn-primary" id="btn-back">◀ Go Back Safely</button>
-            <button class="btn-secondary" id="btn-proceed">Proceed Anyway ▶</button>
+        <div
+          style="
+            background: rgba(0, 0, 0, 0.08);
+            padding: 15px 25px;
+            border-radius: 12px;
+            min-width: 140px;
+          "
+        >
+          <div
+            style="
+              font-size: 12px;
+              text-transform: uppercase;
+              opacity: 0.8;
+              margin-bottom: 5px;
+              color: #000000;
+              font-weight: 600;
+            "
+          >
+            Content Risk
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 700; color: #000000"
+            id="content-percent"
+          >
+            --
+          </div>
         </div>
-        <div class="button-group-secondary">
-            <button class="btn-admin" id="btn-dashboard">📊 Dashboard</button>
-        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn-primary" id="btn-back">◀ Go Back Safely</button>
+        <button class="btn-secondary" id="btn-proceed">Proceed Anyway ▶</button>
+      </div>
+      <div class="button-group-secondary">
+        <button class="btn-admin" id="btn-dashboard">📊 Dashboard</button>
+      </div>
     </div>
 
     <script src="block.js"></script>
-</body>
+  </body>
 </html>

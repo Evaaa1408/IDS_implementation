@@ -29,7 +29,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
         
         // Check if user explicitly chose to proceed to this URL
         if (bypassedUrls.has(url)) {
-            console.log("⏭️ Bypassing check - user chose to proceed:", url);
+            console.log("Bypassing check - user chose to proceed:", url);
             return;
         }
         
@@ -221,6 +221,12 @@ async function fastSecurityCheck(url, tabId) {
     try {
         console.log("🛡️ Pre-navigation check:", url);
         
+        // CRITICAL FIX: Check if user explicitly chose to proceed to this URL FIRST
+        if (bypassedUrls.has(url)) {
+            console.log("⏭️ Bypassing pre-check - user chose to proceed:", url);
+            return; // Don't inject overlay or check - let page load
+        }
+        
         // IMMEDIATELY inject "Checking..." overlay to prevent page from showing
         chrome.scripting.executeScript({
             target: { tabId: tabId },
@@ -321,8 +327,10 @@ async function fastSecurityCheck(url, tabId) {
             console.log("🚫 HIGH RISK BLOCKING - Risk:", data.final_risk_pct.toFixed(1) + "%");
             
             // Redirect to local blocking page (works even if target doesn't exist)
+            const urlProb = (data.url_prob * 100).toFixed(1);
+            const contentProb = (data.content_prob * 100).toFixed(1);
             const blockUrl = chrome.runtime.getURL('block.html') + 
-                `?url=${encodeURIComponent(url)}&risk=${data.final_risk_pct.toFixed(1)}&level=high`;
+                `?url=${encodeURIComponent(url)}&risk=${data.final_risk_pct.toFixed(1)}&level=high&url_prob=${urlProb}&content_prob=${contentProb}`;
             chrome.tabs.update(tabId, { url: blockUrl });
             
             chrome.action.setBadgeText({ text: "⛔", tabId });
@@ -333,8 +341,10 @@ async function fastSecurityCheck(url, tabId) {
             console.log("⚠️ MEDIUM RISK WARNING - Risk:", data.final_risk_pct.toFixed(1) + "%");
             
             // Redirect to local warning page
+            const urlProb = (data.url_prob * 100).toFixed(1);
+            const contentProb = (data.content_prob * 100).toFixed(1);
             const blockUrl = chrome.runtime.getURL('block.html') + 
-                `?url=${encodeURIComponent(url)}&risk=${data.final_risk_pct.toFixed(1)}&level=medium`;
+                `?url=${encodeURIComponent(url)}&risk=${data.final_risk_pct.toFixed(1)}&level=medium&url_prob=${urlProb}&content_prob=${contentProb}`;
             chrome.tabs.update(tabId, { url: blockUrl });
             
             chrome.action.setBadgeText({ text: "⚠", tabId });
@@ -387,89 +397,22 @@ function handleResult(tabId, data) {
         // RED - High risk
         chrome.action.setBadgeText({ text: "RISK", tabId: tabId });
         chrome.action.setBadgeBackgroundColor({ color: "#d9534f", tabId: tabId });
-        
-        console.log("🔴 BLOCKING page");
-        showBlockingOverlay(tabId, data);
+        console.log("🔴 High risk detected - block.html already displayed");
         
     } else if (riskLevel === 'POSSIBLY MALICIOUS' || riskPct > 40) {
         // YELLOW - Medium risk
         chrome.action.setBadgeText({ text: "WARN", tabId: tabId });
         chrome.action.setBadgeBackgroundColor({ color: "#ff9800", tabId: tabId });
-        
-        console.log("🟡 WARNING for page");
-        showWarningOverlay(tabId, data);
+        console.log("🟡 Medium risk detected - block.html already displayed");
         
     } else {
         // GREEN - Safe
         chrome.action.setBadgeText({ text: "SAFE", tabId: tabId });
         chrome.action.setBadgeBackgroundColor({ color: "#28a745", tabId: tabId });
-        
         console.log("🟢 Page is SAFE");
         
         // Show small green notification
         showSafeNotification(tabId, data);
-    }
-}
-
-function showBlockingOverlay(tabId, data) {
-    try {
-        console.log("🔴 SHOW_BLOCK - Attempting to inject RED blocking overlay for tabId:", tabId);
-        console.log("🔴 Message payload:", {
-            action: "SHOW_BLOCK",
-            risk_pct: data.final_risk_pct
-        });
-        
-        chrome.tabs.sendMessage(tabId, { 
-            action: "SHOW_BLOCK",
-            data: {
-                url: data.url,
-                risk_level: data.risk_level,
-                final_risk_pct: data.final_risk_pct,
-                url_prob: data.url_prob * 100,
-                content_prob: data.content_prob * 100,
-                message: data.message,
-                whitelisted: data.whitelisted
-            }
-        }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error("❌ FAILED to inject RED overlay:", chrome.runtime.lastError.message);
-            } else {
-                console.log("✅ RED blocking overlay message sent successfully");
-            }
-        });
-    } catch (err) {
-        console.error("❌ Exception in showBlockingOverlay:", err);
-    }
-}
-
-function showWarningOverlay(tabId, data) {
-    try {
-        console.log("🟡 SHOW_WARNING - Attempting to inject YELLOW warning overlay for tabId:", tabId);
-        console.log("🟡 Message payload:", {
-            action: "SHOW_WARNING",
-            risk_pct: data.final_risk_pct
-        });
-        
-        chrome.tabs.sendMessage(tabId, { 
-            action: "SHOW_WARNING",
-            data: {
-                url: data.url,
-                risk_level: data.risk_level,
-                final_risk_pct: data.final_risk_pct,
-                url_prob: data.url_prob * 100,
-                content_prob: data.content_prob * 100,
-                message: data.message,
-                whitelisted: data.whitelisted
-            }
-        }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error("❌ FAILED to inject YELLOW overlay:", chrome.runtime.lastError.message);
-            } else {
-                console.log("✅ YELLOW warning overlay message sent successfully");
-            }
-        });
-    } catch (err) {
-        console.error("❌ Exception in showWarningOverlay:", err);
     }
 }
 

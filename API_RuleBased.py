@@ -25,7 +25,7 @@ except Exception as e:
 
 # File paths
 LOG_FILE = os.path.join(os.path.dirname(__file__), 'HTML_logs', 'Malicious_log.csv')
-FALSE_POSITIVE_FILE = os.path.join(os.path.dirname(__file__), 'HTML_logs', 'false_positive_log.json')
+FALSE_POSITIVE_FILE = os.path.join(os.path.dirname(__file__), 'HTML_logs', 'false_positive_log.csv')
 
 # Initialize CSV file if it doesn't exist
 if not os.path.exists(LOG_FILE):
@@ -34,10 +34,12 @@ if not os.path.exists(LOG_FILE):
         writer = csv.writer(f)
         writer.writerow(['timestamp', 'url', 'domain', 'prediction', 'probability', 'action', 'risk_level', 'reason', 'detailed_reason'])
 
-# Initialize false positive file
+# Initialize false positive CSV file if it doesn't exist
 if not os.path.exists(FALSE_POSITIVE_FILE):
-    with open(FALSE_POSITIVE_FILE, 'w', encoding='utf-8') as f:
-        json.dump([], f)
+    os.makedirs(os.path.dirname(FALSE_POSITIVE_FILE), exist_ok=True)
+    with open(FALSE_POSITIVE_FILE, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['marked_at', 'original_timestamp', 'url', 'domain', 'prediction', 'probability', 'risk_level', 'action', 'reason', 'detailed_reason', 'admin_note'])
 
 def get_risk_level(probability):
     """Determine risk level based on probability"""
@@ -314,9 +316,15 @@ def get_stats():
         
         # Get false positives
         false_positives = []
-        if os.path.exists(FALSE_POSITIVE_FILE):
-            with open(FALSE_POSITIVE_FILE, 'r', encoding='utf-8') as f:
-                false_positives = json.load(f)
+        try:
+            if os.path.exists(FALSE_POSITIVE_FILE):
+                with open(FALSE_POSITIVE_FILE, 'r', encoding='utf-8') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        false_positives.append(row)
+        except Exception as csv_error:
+            print(f"⚠️ Error reading false positive CSV: {csv_error}")
+            # Continue with empty list
         
         false_positive_count = len(false_positives)
         false_positive_today = len([fp for fp in false_positives if fp.get('marked_at', '').startswith(today)])
@@ -345,7 +353,22 @@ def get_false_positives():
         false_positives = []
         if os.path.exists(FALSE_POSITIVE_FILE):
             with open(FALSE_POSITIVE_FILE, 'r', encoding='utf-8') as f:
-                false_positives = json.load(f)
+                reader = csv.DictReader(f)
+                for row in reader:
+                    # Convert CSV row to match expected frontend format
+                    false_positives.append({
+                        'timestamp': row['marked_at'],
+                        'original_detection_time': row['original_timestamp'],
+                        'url': row['url'],
+                        'domain': row['domain'],
+                        'predicted_label': row['prediction'],
+                        'confidence': float(row['probability'].replace('%', '')) / 100 if '%' in row['probability'] else float(row['probability']),
+                        'risk_level': row['risk_level'],
+                        'action_taken': row['action'],
+                        'detection_reason': row['reason'],
+                        'detailed_features': row['detailed_reason'],
+                        'admin_note': row['admin_note']
+                    })
         
         # Return in reverse order (newest first)
         false_positives.reverse()
@@ -362,7 +385,7 @@ def get_false_positives():
 
 @app.route("/api/mark_false_positive", methods=["POST"])
 def mark_false_positive():
-    """Mark a URL as false positive"""
+    """Mark a URL as false positive removes from malicious log and adds to false positive CSV"""
     try:
         data = request.get_json()
         url = data.get('url')
@@ -372,69 +395,81 @@ def mark_false_positive():
         if not url:
             return jsonify({"success": False, "error": "URL required"}), 400
         
-        # Extract domain
-        ext = tldextract.extract(url)
-        domain = f"{ext.domain}.{ext.suffix}" if ext.suffix else ext.domain
-        
-        # Find the original log entry to get prediction details
+        # Read all logs from malicious_log.csv
+        all_logs = []
         original_log = None
+        
         if os.path.exists(LOG_FILE):
             with open(LOG_FILE, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
                     if row['url'] == url and row['timestamp'] == timestamp:
-                        original_log = row
-                        break
+                        original_log = row  # Found the entry to remove
+                    else:
+                        all_logs.append(row)  # Keep all other entries
         
-        # Load existing false positives
-        false_positives = []
+        if not original_log:
+            return jsonify({
+                "success": False,
+                "error": "Original log entry not found"
+            }), 404
+        
+        # Check if already marked as false positive
         if os.path.exists(FALSE_POSITIVE_FILE):
             with open(FALSE_POSITIVE_FILE, 'r', encoding='utf-8') as f:
-                false_positives = json.load(f)
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row['url'] == url and row['original_timestamp'] == timestamp:
+                        return jsonify({
+                            "success": True,
+                            "message": "Already marked as false positive",
+                            "already_marked": True
+                        })
         
-        # Check if already marked
-        already_marked = any(fp['url'] == url and fp.get('original_timestamp') == timestamp 
-                            for fp in false_positives)
+        # Write back to malicious_log.csv WITHOUT the false positive entry
+        with open(LOG_FILE, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=['timestamp', 'url', 'domain', 'prediction', 
+                                                   'probability', 'action', 'risk_level', 
+                                                   'reason', 'detailed_reason'])
+            writer.writeheader()
+            writer.writerows(all_logs)
         
-        if already_marked:
-            return jsonify({
-                "success": True,
-                "message": "Already marked as false positive",
-                "already_marked": True
-            })
-        
-        # Create detailed false positive entry for post-analysis
-        false_positive_entry = {
-            "timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),  # ISO format
-            "url": url,
-            "domain": domain,
-            "predicted_label": original_log['prediction'] if original_log else "unknown",
-            "confidence": float(original_log['probability'].replace('%', '')) / 100 if original_log and original_log.get('probability') else 0.0,
-            "risk_level": original_log['risk_level'] if original_log else "unknown",
-            "action_taken": original_log['action'] if original_log else "unknown",
-            "original_detection_time": timestamp,
-            "admin_action": "marked_false_positive",
-            "admin_note": admin_note,
-            # Feature information for analysis
-            "detection_reason": original_log['reason'] if original_log else "unknown",
-            "detailed_features": original_log['detailed_reason'] if original_log else "unknown"
+        # Add to false_positive_log.csv
+        marked_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        fp_entry = {
+            'marked_at': marked_timestamp,
+            'original_timestamp': timestamp,
+            'url': url,
+            'domain': original_log['domain'],
+            'prediction': original_log['prediction'],
+            'probability': original_log['probability'],
+            'risk_level': original_log['risk_level'],
+            'action': original_log['action'],
+            'reason': original_log['reason'],
+            'detailed_reason': original_log['detailed_reason'],
+            'admin_note': admin_note
         }
         
-        false_positives.append(false_positive_entry)
+        # Initialize false positive CSV if it doesn't exist
+        file_exists = os.path.exists(FALSE_POSITIVE_FILE)
+        if not file_exists:
+            with open(FALSE_POSITIVE_FILE, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=list(fp_entry.keys()))
+                writer.writeheader()
         
-        # Save updated list
-        with open(FALSE_POSITIVE_FILE, 'w', encoding='utf-8') as f:
-            json.dump(false_positives, f, indent=2, ensure_ascii=False)
+        # Append to false positive CSV
+        with open(FALSE_POSITIVE_FILE, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=list(fp_entry.keys()))
+            writer.writerow(fp_entry)
         
-        print(f"✅ False Positive Logged: {url}")
-        print(f"   Domain: {domain}")
-        print(f"   Confidence: {false_positive_entry['confidence']:.2f}")
-        print(f"   Total FPs: {len(false_positives)}")
+        print(f"✅ False Positive Marked: {url}")
+        print(f"   Removed from: Malicious_log.csv")
+        print(f"   Added to: false_positive_log.csv")
         
         return jsonify({
             "success": True,
             "message": "Marked as false positive successfully",
-            "total_false_positives": len(false_positives)
+            "removed_from_malicious_log": True
         })
     except Exception as e:
         import traceback

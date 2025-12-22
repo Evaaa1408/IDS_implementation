@@ -4,6 +4,7 @@
 
 // Global state
 let allLogs = [];
+let currentDisplayedLogs = [];
 let currentFilter = "all";
 
 // ============================================================
@@ -103,6 +104,7 @@ function animateCounter(elementId, targetValue) {
 // ============================================================
 
 function renderTable(logs) {
+  currentDisplayedLogs = logs;
   const tbody = document.getElementById("logTableBody");
 
   if (logs.length === 0) {
@@ -683,6 +685,71 @@ function refreshDashboard() {
       refreshIcon.style.animation = "";
     }, 1000);
   });
+}
+
+function exportToCSV() {
+  if (!currentDisplayedLogs || currentDisplayedLogs.length === 0) {
+    showNotification("No data to export", "error");
+    return;
+  }
+
+  // Define headers
+  const headers = ["Timestamp", "URL", "Prediction", "Probability", "Risk Level", "Action", "Reason"];
+  
+  // Convert logs to CSV rows
+  const csvRows = [headers.join(",")];
+  
+  currentDisplayedLogs.forEach(log => {
+    let timestampStr = log.timestamp;
+    try {
+        timestampStr = new Date(log.timestamp).toLocaleString();
+    } catch(e) {}
+
+    // Helper to clean text: remove emojis and replace bullets
+    const cleanForCSV = (text) => {
+        if (!text) return "";
+        return text
+            .toString()
+            .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F700}-\u{1F7FF}\u{1F900}-\u{1F9FF}]/gu, '') 
+            .replace(/•/g, '-')     
+            .replace(/â€¢/g, '-')   
+            .replace(/ðŸŸ¡/g, '')  
+            .replace(/ðŸ/g, '')    
+            .trim();
+    };
+
+    const prediction = log.prediction || (log.probability > 0.5 ? 'Phishing' : 'Legitimate');
+    const riskLevel = log.risk_level || getRiskLevel(log.probability);
+    const action = log.action || 'Unknown';
+    const reason = log.detailed_reason || log.reason || '';
+
+    const row = [
+      `"${timestampStr}"`,
+      `"${(log.url || '').replace(/"/g, '""')}"`,
+      `"${cleanForCSV(prediction)}"`,
+      `"${log.probability}"`,
+      `"${cleanForCSV(riskLevel)}"`,
+      `"${cleanForCSV(action)}"`,
+      `"${cleanForCSV(reason).replace(/"/g, '""')}"`
+    ];
+    csvRows.push(row.join(","));
+  });
+  
+  // Create blob and download link
+  const csvString = csvRows.join("\n");
+  // Add BOM (Byte Order Mark) for Excel to recognize UTF-8
+  const blob = new Blob(["\uFEFF" + csvString], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `detection_logs_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  showNotification("✅ Export started!", "success");
 }
 
 // ============================================================

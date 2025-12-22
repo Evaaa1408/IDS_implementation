@@ -1,8 +1,7 @@
 timestamp,url,domain,prediction,probability,action,risk_level,reason,detailed_reason
-
-2025-12-20 05:13:31,http://rtce003.exe/,exe,Phishing,44.99%,Warned,✅ Safe,Suspicious URL pattern," • No readable slug detected
-• Overall risk probability: 45.0%"
-2025-12-20 05:26:58,http://rtce003.exe/,exe,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
-• Overall risk probability: 45.0%"
 2025-12-21 00:41:22,http://triofloridashow.com/ap/amzon/amzon/8bd58ab8131926c8f342b405377aef36/index/web/login.php,triofloridashow.com,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
 • Overall risk probability: 45.0%"
+2025-12-22 22:16:30,http://xjbctcky.com/images/?app=com-d3&amp;us.battle.net/login/enhttp=,xjbctcky.com,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-23 03:02:25,http://www.w3.org/2000/svg,w3.org,Phishing,44.89%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 44.9%"

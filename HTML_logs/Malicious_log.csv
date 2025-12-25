@@ -3,5 +3,33 @@ timestamp,url,domain,prediction,probability,action,risk_level,reason,detailed_re
 • Overall risk probability: 45.0%"
 2025-12-22 22:16:30,http://xjbctcky.com/images/?app=com-d3&amp;us.battle.net/login/enhttp=,xjbctcky.com,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
 • Overall risk probability: 45.0%"
-2025-12-23 03:02:25,http://www.w3.org/2000/svg,w3.org,Phishing,44.89%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+2025-12-23 04:20:28,http://gypsu.com/g490f,gypsu.com,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-24 14:04:20,http://findbsbnumbers.com.au/branch/3491,findbsbnumbers.com.au,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-24 14:06:02,http://findbsbnumbers.com.au/lander,findbsbnumbers.com.au,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-24 14:17:36,http://findbsbnumbers.com.au/lander,findbsbnumbers.com.au,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-24 18:17:11,http://findbsbnumbers.com.au/branch/3491,findbsbnumbers.com.au,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-24 18:17:20,http://servprotectproserveur.freeweb.pk/,freeweb.pk,Phishing,44.84%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 44.8%"
+2025-12-24 18:20:14,http://www.kimpleafrica.com/wp-includes/ID3/db/box/,kimpleafrica.com,Phishing,44.97%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-24 22:47:00,http://dudukadafonseca.com/Duduka%20da%20Fonseca_files/files/Arch/Arch/Archive/index.php,dudukadafonseca.com,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-25 04:41:51,http://suspicious-new-site.com,suspicious-new-site.com,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-25 04:56:23,http://one.fdsfgsgdvsd.biz/xeud7fvldo/nfergumi.michaelferguson.co.uk/pvthg2.html,fdsfgsgdvsd.biz,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-25 04:57:40,http://suspicious-new-site.com/,suspicious-new-site.com,Phishing,44.97%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-25 04:59:12,http://www.w3.org/2000/svg,w3.org,Phishing,44.89%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
 • Overall risk probability: 44.9%"
+2025-12-26 04:20:09,https://login.microsoftonline.com/0fed03a3-402d-4633-a8cd-8b308822253e/oauth2/v2.0/authorize?client_id=e96b418c-3f97-4b0f-b124-1cb3b347a06e&response_type=code&redirect_uri=https%3A%2F%2Fauth.apu.edu.my%2Fauth_token&scope=Group.Read.All+GroupMember.Read.All+User.Read+offline_access+openid+profile&state=%7B%22origin%22%3A+%22https%3A%2F%2Fapspace.apu.edu.my%22%2C+%22endpoint%22%3A+%22%2Flogin%22%2C+%22app_id%22%3A+%22apspace%22%7D&sso_reload=true,microsoftonline.com,Phishing,40.18%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 40.2%"
+2025-12-26 04:22:52,http://one.fdsfgsgdvsd.biz/xeud7fvldo/nfergumi.michaelferguson.co.uk/pvthg2.html,fdsfgsgdvsd.biz,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-26 04:23:37,http://23.235.162.74:555/Linux,23.235.162.74,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"

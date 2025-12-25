@@ -42,10 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (results && results[0] && results[0].result) {
                     htmlContent = results[0].result;
-                    console.log("✅ HTML captured:", htmlContent.length, "characters");
                 }
             } catch (err) {
-                console.warn("⚠️ Could not capture HTML:", err);
                 // Continue without HTML (URL-only mode)
             }
             
@@ -71,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayResult(data);
 
             } catch (error) {
-                console.error(error);
                 statusBox.textContent = "API Error (Is Flask running?)";
                 statusBox.className = 'status-box unknown';
                 loader.style.display = 'none';

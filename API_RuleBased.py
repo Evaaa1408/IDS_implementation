@@ -7,6 +7,7 @@ import csv
 import json
 from datetime import datetime
 import tldextract
+from urllib.parse import urlparse
 
 sys.path.append(os.path.dirname(__file__))
 
@@ -18,9 +19,9 @@ CORS(app)  # Enable CORS for Chrome Extension
 # Initialize Predictor
 try:
     predictor = RuleBasedFusionPredictor()
-    print("✅ Rule-Based Predictor Initialized")
+    print("Rule-Based Predictor Initialized")
 except Exception as e:
-    print(f"❌ Failed to initialize predictor: {e}")
+    print(f"Failed to initialize predictor: {e}")
     predictor = None
 
 # File paths
@@ -94,6 +95,65 @@ def extract_feature_explanations(url, result):
     
     return explanations
 
+# FALSE POSITIVE OVERRIDE FUNCTIONS
+# Cache for false positive URLs with file modification time
+_fp_cache = {
+    'urls': set(),
+    'mtime': None
+}
+
+def normalize_url(url):
+    """ Normalize URL to handle variations (trailing slashes, params, case) """
+    try:
+        parsed = urlparse(url)
+        # Preserve scheme and netloc, normalize path
+        normalized = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+        # Remove trailing slash and convert to lowercase for consistency
+        normalized = normalized.rstrip('/').lower()
+        return normalized
+    except Exception as e:
+        print(f"Error normalizing URL {url}: {e}")
+        return url.lower()  # Fallback to lowercase only
+
+def load_false_positive_urls():
+    """ Load false positive URLs from CSV with mtime-based cache invalidation.
+        This implements a post-prediction policy override based on verified false positives. """
+    global _fp_cache
+    
+    try:
+        # Check if file exists
+        if not os.path.exists(FALSE_POSITIVE_FILE):
+            return set()
+        
+        # Get current file modification time
+        current_mtime = os.path.getmtime(FALSE_POSITIVE_FILE)
+        
+        # Return cached data if file hasn't been modified
+        if _fp_cache['mtime'] == current_mtime and _fp_cache['urls']:
+            return _fp_cache['urls']
+        
+        # File has been modified or cache is empty - reload
+        fp_urls = set()
+        with open(FALSE_POSITIVE_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                url = row.get('url', '').strip()
+                if url:
+                    # Normalize URL before storing
+                    normalized_url = normalize_url(url)
+                    fp_urls.add(normalized_url)
+        
+        # Update cache
+        _fp_cache['urls'] = fp_urls
+        _fp_cache['mtime'] = current_mtime
+        
+        print(f"✅ Loaded {len(fp_urls)} verified false positive URLs (cache updated)")
+        return fp_urls
+        
+    except Exception as e:
+        print(f"⚠️ Error loading false positive URLs: {e}")
+        return set()
+
 def log_to_csv(url, result):
     "Log phishing to CSV file"
     try:
@@ -154,12 +214,9 @@ def log_to_csv(url, result):
                 detailed_reason
             ])
     except Exception as e:
-        print(f"⚠️ Error logging to CSV: {e}")
+        print(f"Error logging to CSV: {e}")
 
-# -------------------------------------------------------------------
 # MAIN ENDPOINTS
-# -------------------------------------------------------------------
-
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({
@@ -185,7 +242,7 @@ def predict():
     try:
         # Log request
         print(f"\n{'='*70}")
-        print(f"📡 API REQUEST")
+        print(f"API REQUEST")
         print(f"{'='*70}")
         print(f"URL: {url}")
         print(f"HTML Available: {html_content is not None}")
@@ -193,6 +250,36 @@ def predict():
         
         # Run prediction
         result = predictor.predict(url, html_content)
+        
+        # POST-PREDICTION POLICY OVERRIDE FOR VERIFIED FALSE POSITIVES
+        # Normalize the current URL for comparison
+        normalized_url = normalize_url(url)
+        
+        # Load false positive URLs (cached with mtime check)
+        fp_urls = load_false_positive_urls()
+        
+        # Check if this URL has been verified as a false positive
+        is_false_positive_override = normalized_url in fp_urls
+        
+        # Store original model predictions (for transparency and auditing)
+        model_prediction = "phishing" if result.get('is_phishing', False) else "legitimate"
+        model_risk_level = result.get('risk_level', 'UNKNOWN')
+        model_probability = result.get('final_risk_pct', 0.0)
+        model_color = result.get('color', 'gray')
+        
+        # Apply post-prediction policy override if URL is verified false positive
+        if is_false_positive_override:
+            # Override decision - this URL was verified as safe by admin
+            result['is_phishing'] = False
+            result['risk_level'] = 'SAFE (FALSE POSITIVE)'
+            result['final_risk_pct'] = 0.0
+            result['color'] = 'blue'  # Blue indicates user-verified false positive
+            result['message'] = 'This URL was previously reported as a false positive by administrators'
+            
+            print(f"FALSE POSITIVE OVERRIDE APPLIED")
+            print(f"URL: {url}")
+            print(f"Original Model Prediction: {model_prediction}")
+            print(f"Final Decision: legitimate (policy override)")
         
         # Format response for browser extension
         response = {
@@ -203,14 +290,22 @@ def predict():
             # Model predictions
             "url_prob": result.get('url_prob', 0.0),
             "content_prob": result.get('content_prob', 0.0),
+            "model_prediction": model_prediction,
+            "model_risk_level": model_risk_level,
+            "model_probability": model_probability,
             
-            # Final decision
+            # Final decision (after policy override if applicable)
+            "final_decision": "phishing" if result.get('is_phishing', False) else "legitimate",
             "final_risk_pct": result.get('final_risk_pct', 0.0),
             "risk_level": result.get('risk_level', 'UNKNOWN'),
             "color": result.get('color', 'gray'),
             "confidence": result.get('confidence', 'UNKNOWN'),
             "is_phishing": result.get('is_phishing', False),
             "message": result.get('message', ''),
+            
+            # Override tracking
+            "overridden": is_false_positive_override,
+            "override_reason": "Verified false positive by admin" if is_false_positive_override else None,
             
             # Additional info
             "whitelisted": result.get('whitelisted', False),
@@ -233,15 +328,12 @@ def predict():
         return jsonify(response)
         
     except Exception as e:
-        print(f"❌ Error during prediction: {e}")
+        print(f"Error during prediction: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
-# -------------------------------------------------------------------
 # Dashboard Endpoints
-# -------------------------------------------------------------------
-
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
     """Serves the Admin Dashboard HTML"""
@@ -323,8 +415,7 @@ def get_stats():
                     for row in reader:
                         false_positives.append(row)
         except Exception as csv_error:
-            print(f"⚠️ Error reading false positive CSV: {csv_error}")
-            # Continue with empty list
+            print(f"Error reading false positive CSV: {csv_error}")
         
         false_positive_count = len(false_positives)
         false_positive_today = len([fp for fp in false_positives if fp.get('marked_at', '').startswith(today)])
@@ -462,9 +553,9 @@ def mark_false_positive():
             writer = csv.DictWriter(f, fieldnames=list(fp_entry.keys()))
             writer.writerow(fp_entry)
         
-        print(f"✅ False Positive Marked: {url}")
-        print(f"   Removed from: Malicious_log.csv")
-        print(f"   Added to: false_positive_log.csv")
+        print(f"False Positive Marked: {url}")
+        print(f"Removed from: Malicious_log.csv")
+        print(f"Added to: false_positive_log.csv")
         
         return jsonify({
             "success": True,
@@ -479,10 +570,7 @@ def mark_false_positive():
             "error": str(e)
         }), 500
 
-# -------------------------------------------------------------------
 # HEALTH CHECK
-# -------------------------------------------------------------------
-
 @app.route("/health", methods=["GET"])
 def health_check():
     """Simple health check endpoint"""
@@ -493,17 +581,17 @@ def health_check():
 
 if __name__ == "__main__":
     print("="*70)
-    print(" 🚀 STARTING RULE-BASED PHISHING DETECTION API")
+    print("STARTING RULE-BASED PHISHING DETECTION API")
     print("="*70)
-    print("\n📋 Configuration:")
-    print("   • Method: Rule-Based Fusion")
-    print("   • Port: 5000")
-    print("   • CORS: Enabled")
-    print("   • DataCollector: Disabled (removed)")
-    print("\n🌐 Endpoints:")
-    print("   • POST /predict - Main prediction")
-    print("   • GET /health - Health check")
-    print("   • GET /api/stats - System stats")
+    print("Configuration:")
+    print("• Method: Rule-Based Fusion")
+    print("• Port: 5000")
+    print("• CORS: Enabled")
+    print("• DataCollector: Disabled (removed)")
+    print("Endpoints:")
+    print("POST /predict - Main prediction")
+    print("GET /health - Health check")
+    print("GET /api/stats - System stats")
     print("\n" + "="*70 + "\n")
     
     app.run(host="0.0.0.0", port=5000, debug=True)        

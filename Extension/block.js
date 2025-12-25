@@ -17,7 +17,7 @@ if (level === 'medium') {
     document.body.classList.add('warning-mode');
     document.getElementById('title').textContent = 'SUSPICIOUS WEBSITE';
     document.getElementById('subtitle').textContent = 'This website shows some suspicious characteristics. Exercise caution if you choose to proceed.';
-    document.querySelector('.icon').textContent = '⚠️';
+    document.querySelector('.icon').textContent = '';
 }
 
 function goBack() {

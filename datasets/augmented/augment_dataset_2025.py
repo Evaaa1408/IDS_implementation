@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Changed_Solution.Changed_feature_extractor import ChangedURLFeatureExtractor
 
 print("\n" + "="*70)
-print(" 📦 AUGMENTING MODEL 2025 TRAINING DATASET")
+print("  AUGMENTING MODEL 2025 TRAINING DATASET")
 print("="*70)
 
 # Complex legitimate URLs
@@ -1425,11 +1425,11 @@ educational_urls = [
 # ============================================================
 all_urls = diverse_legitimate_urls + educational_urls + complex_legitimate_urls 
 
-print(f"\n📊 Total URLs to add: {len(all_urls):,}")
+print(f"\n Total URLs to add: {len(all_urls):,}")
 print(f"   - Diverse legitimate sites: {len(diverse_legitimate_urls):,}")
 print(f"   - Educational security content: {len(educational_urls):,}")
 
-print(f"\n📋 Distribution (diverse URLs):")
+print(f"\n Distribution (diverse URLs):")
 print(f"   - Education: ~500")
 print(f"   - AI/Tech: ~600")
 print(f"   - News: ~400")
@@ -1438,7 +1438,7 @@ print(f"   - Government: ~350")
 print(f"   - SaaS: ~500")
 print(f"   - Popular/Social: ~650")
 
-print(f"\n📋 Distribution (educational URLs):")
+print(f"\n Distribution (educational URLs):")
 print(f"   - Cybersecurity blogs & news")
 print(f"   - Banking/financial security pages")
 print(f"   - E-commerce account protection")
@@ -1449,13 +1449,13 @@ print(f"   - Tech & developer forums")
 # ============================================================
 # Load existing dataset
 # ============================================================
-print("\n📥 Loading existing dataset...")
+print("\n Loading existing dataset...")
 try:
     X_existing = joblib.load("Models/2025/features_2025.pkl")
     y_existing = joblib.load("Models/2025/labels_2025.pkl")
-    print(f"✅ Loaded existing dataset: {len(y_existing)} samples")
+    print(f" Loaded existing dataset: {len(y_existing)} samples")
 except FileNotFoundError:
-    print("❌ ERROR: features_2025.pkl or labels_2025.pkl not found!")
+    print(" ERROR: features_2025.pkl or labels_2025.pkl not found!")
     print("   Please run the preprocessing script first.")
     sys.exit(1)
 
@@ -1464,15 +1464,15 @@ url_tracking_file = "augmented_urls_2025.txt"
 try:
     with open(url_tracking_file, 'r') as f:
         existing_urls = set(line.strip() for line in f)
-    print(f"✅ Loaded URL tracking: {len(existing_urls)} URLs previously added")
+    print(f" Loaded URL tracking: {len(existing_urls)} URLs previously added")
 except FileNotFoundError:
     existing_urls = set()
-    print(f"📝 No URL tracking file found - will create new one")
+    print(f" No URL tracking file found - will create new one")
 
 # ============================================================
 # Extract features for new URLs 
 # ============================================================
-print("\n🔬 Extracting features for new URLs...")
+print("\n Extracting features for new URLs...")
 extractor = ChangedURLFeatureExtractor()
 new_features = []
 new_urls = []
@@ -1492,16 +1492,16 @@ for i, url in enumerate(all_urls, 1):
         new_features.append(feats)
         new_urls.append(url)
     except Exception as e:
-        print(f"   ⚠️  Warning: Failed to extract features for {url}: {e}")
+        print(f"     Warning: Failed to extract features for {url}: {e}")
 
-print(f"✅ Successfully extracted features for {len(new_features)} URLs")
+print(f" Successfully extracted features for {len(new_features)} URLs")
 if skipped > 0:
-    print(f"   ⏭️  Skipped {skipped} URLs (already in dataset)")
+    print(f"   ⏭  Skipped {skipped} URLs (already in dataset)")
 
 # ============================================================
 # Combine datasets
 # ============================================================
-print("\n🔗 Combining datasets...")
+print("\n Combining datasets...")
 
 # Convert X_existing to DataFrame if it's a list
 if isinstance(X_existing, list):
@@ -1515,20 +1515,20 @@ if len(new_features) > 0:
     y_new = [0] * len(new_features)  # 0 = Legitimate
     y_combined = list(y_existing) + y_new
     
-    print(f"✅ Combined dataset:")
+    print(f" Combined dataset:")
     print(f"   Original samples: {len(y_existing)}")
     print(f"   New samples added: {len(y_new)}")
     print(f"   Total samples: {len(y_combined)}")
 else:
     X_combined = X_existing
     y_combined = y_existing
-    print(f"⚠️  No new URLs to add (all {len(all_urls)} URLs already in dataset)")
+    print(f"  No new URLs to add (all {len(all_urls)} URLs already in dataset)")
     print(f"   Dataset unchanged: {len(y_combined)} samples")
 
 # ============================================================
 # Save augmented dataset
 # ============================================================
-print("\n💾 Saving augmented dataset...")
+print("\n Saving augmented dataset...")
 
 # Ensure X_combined is a DataFrame before saving
 if not isinstance(X_combined, pd.DataFrame):
@@ -1538,7 +1538,7 @@ if not isinstance(X_combined, pd.DataFrame):
 joblib.dump(X_combined, "Models/2025/features_2025.pkl")
 joblib.dump(y_combined, "Models/2025/labels_2025.pkl")
 
-print("✅ Saved:")
+print(" Saved:")
 print(f"   - Models/2025/features_2025.pkl (shape: {X_combined.shape})")
 print(f"   - Models/2025/labels_2025.pkl (length: {len(y_combined)})")
 
@@ -1554,11 +1554,11 @@ if len(new_urls) > 0:
 # Summary
 # ============================================================
 print("\n" + "="*70)
-print(" ✅ DATASET AUGMENTATION COMPLETE")
+print("  DATASET AUGMENTATION COMPLETE")
 print("="*70)
 print(f"\nTotal dataset size: {len(y_combined):,} samples")
 print(f"New unique URLs added: {len(new_urls):,}")
-print(f"\n📊 Label distribution:")
+print(f"\n Label distribution:")
 # Fix: Properly count labels
 label_counts = Counter(y_combined)
 for label in [0, 1]:

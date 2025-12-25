@@ -1,16 +1,12 @@
 // content.js
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("Content.js received message:", request.action, request);
     
     if (request.action === "SHOW_SAFE") {
-        console.log("Showing GREEN safe notification");
         showSafeNotification(request.data);
     } else if (request.action === "SHOW_FALSE_POSITIVE") {
-        console.log("Showing BLUE false positive notification");
         showFalsePositiveNotification(request.data);
     } else {
-        console.log("Unknown action:", request.action);
     }
     
     sendResponse({received: true});
@@ -87,7 +83,7 @@ function showSafeNotification(data) {
             </svg>
             <div style="flex: 1;">
                 <div style="font-weight: 600; margin-bottom: 4px;">
-                    ✓ Website is Safe
+                     Website is Safe
                 </div>
                 <div style="font-size: 12px; opacity: 0.9;">
                     Risk: ${riskPct.toFixed(1)}%
@@ -180,7 +176,7 @@ function showFalsePositiveNotification(data) {
             </svg>
             <div style="flex: 1;">
                 <div style="font-weight: 600; margin-bottom: 4px;">
-                    ✓ Safe Site (Verified)
+                     Safe Site (Verified)
                 </div>
                 <div style="font-size: 12px; opacity: 0.9;">
                     Previously reported as false positive

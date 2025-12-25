@@ -29,7 +29,6 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 
     // Check if user explicitly chose to proceed to this URL
     if (bypassedUrls.has(url)) {
-      console.log("Bypassing check - user chose to proceed:", url);
       return;
     }
 
@@ -57,7 +56,6 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     ];
 
     if (skipDomains.includes(domain)) {
-      console.log("⏭️ Skipping safe domain:", domain);
       return;
     }
 
@@ -69,7 +67,6 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
       urlPath.includes("&q=") ||
       urlPath.includes("?query=")
     ) {
-      console.log("⏭️ Skipping search query URL:", url);
       return;
     }
 
@@ -85,7 +82,6 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     // Fast pre-navigation check (blocking dangerous sites immediately)
     await fastSecurityCheck(url, tabId);
   } catch (e) {
-    console.error("URL parsing error:", e);
   }
 });
 
@@ -102,11 +98,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // If we have a stored result for this tab, show the notification
     const result = checkResults.get(tabId);
     if (result) {
-      console.log("📬 Showing post-load notification for:", tab.url);
       
       // Check if this is a false positive override
       if (result.is_false_positive === true) {
-        console.log("🔵 Page loaded - sending blue false positive notification to content script");
         
         // Send blue notification for false positive (to content script on real pages)
         chrome.tabs
@@ -120,10 +114,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
             },
           })
           .then(() => {
-            console.log("✅ Blue notification sent successfully to content script");
             checkResults.delete(tabId); // Clean up
           })
-          .catch((err) => console.error("Failed to send blue notification:", err.message));
       } else {
         // Normal safe/warning notification
         handleResult(tabId, result);
@@ -142,7 +134,6 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 
 async function checkUrl(url, tabId) {
   try {
-    console.log("📡 Fast scanning:", url);
 
     // ========================================================
     // PHASE 1: IMMEDIATE URL-ONLY CHECK (Fast ~200ms)
@@ -158,25 +149,18 @@ async function checkUrl(url, tabId) {
     });
 
     if (!urlOnlyResponse.ok) {
-      console.error("❌ API Error:", urlOnlyResponse.status);
       showErrorBadge(tabId);
       return;
     }
 
     const urlOnlyData = await urlOnlyResponse.json();
 
-    console.log(
-      "⚡ Fast URL check:",
-      urlOnlyData.risk_level,
-      urlOnlyData.final_risk_pct + "%"
-    );
 
     // If URL-only check shows high risk, BLOCK IMMEDIATELY
     if (
       urlOnlyData.final_risk_pct > 60 ||
       urlOnlyData.risk_level === "VERY SUSPICIOUS"
     ) {
-      console.log("🔴 IMMEDIATE BLOCK based on URL");
       handleResult(tabId, urlOnlyData);
       return; // Don't bother with content check
     }
@@ -212,11 +196,9 @@ async function checkUrl(url, tabId) {
         if (results && results[0] && results[0].result) {
           htmlContent = results[0].result;
           htmlCaptured = true;
-          console.log("✅ HTML captured:", htmlContent.length, "bytes");
         }
       }
     } catch (err) {
-      console.error("❌ HTML capture exception:", err.message);
     }
 
     // Full analysis with content
@@ -231,22 +213,15 @@ async function checkUrl(url, tabId) {
     });
 
     if (!fullResponse.ok) {
-      console.error("❌ Full API Error:", fullResponse.status);
       return; // Keep showing URL-only result
     }
 
     const fullData = await fullResponse.json();
 
-    console.log(
-      "📥 Full analysis:",
-      fullData.risk_level,
-      fullData.final_risk_pct + "%"
-    );
 
     // Update with full analysis result
     handleResult(tabId, fullData);
   } catch (error) {
-    console.error("❌ Connection Failed:", error);
     showErrorBadge(tabId);
   }
 }
@@ -256,11 +231,9 @@ async function checkUrl(url, tabId) {
 // ========================================================
 async function fastSecurityCheck(url, tabId) {
   try {
-    console.log("🛡️ Pre-navigation check:", url);
 
     // CRITICAL FIX: Check if user explicitly chose to proceed to this URL FIRST
     if (bypassedUrls.has(url)) {
-      console.log("⏭️ Bypassing pre-check - user chose to proceed:", url);
       return; // Don't inject overlay or check - let page load
     }
 
@@ -320,7 +293,7 @@ async function fastSecurityCheck(url, tabId) {
                     </style>
                     <div class="check-card">
                         <div class="spinner"></div>
-                        <h3>🔍 Checking Security</h3>
+                        <h3> Checking Security</h3>
                         <p>Analyzing for threats...</p>
                     </div>
                 `;
@@ -335,7 +308,6 @@ async function fastSecurityCheck(url, tabId) {
         },
         world: "MAIN",
       })
-      .catch((err) => console.error("Failed to inject checking overlay:", err));
 
     // Fast URL-only check
     const response = await fetch(API_ENDPOINT, {
@@ -349,27 +321,16 @@ async function fastSecurityCheck(url, tabId) {
     });
 
     if (!response.ok) {
-      console.error("API Error:", response.status);
       return; // Let page load on API error
     }
 
     const data = await response.json();
 
-    console.log(
-      "⚡ Fast Check Result:",
-      data.risk_level,
-      data.final_risk_pct + "%"
-    );
-    console.log("📊 Full API Response:", JSON.stringify(data, null, 2));
 
     // ========================================================
     // CHECK FOR FALSE POSITIVE OVERRIDE
     // ========================================================
     if (data.overridden === true) {
-      console.log("🔵 FALSE POSITIVE OVERRIDE DETECTED!");
-      console.log("   Model predicted:", data.model_prediction);
-      console.log("   Final decision:", data.final_decision);
-      console.log("   Reason:", data.override_reason);
 
       // Remove the checking overlay immediately
       chrome.scripting
@@ -384,7 +345,6 @@ async function fastSecurityCheck(url, tabId) {
             }
           },
         })
-        .catch((err) => console.log("Overlay already removed:", err));
 
       // Set BLUE badge for false positive
       chrome.action.setBadgeText({ text: "FP", tabId });
@@ -395,14 +355,12 @@ async function fastSecurityCheck(url, tabId) {
       data.is_false_positive = true;
       checkResults.set(tabId, data);
       
-      console.log("✅ False positive data stored for later notification");
       
       // Fallback: If page doesn't finish loading (error page, blocked, etc.),
       // send notification after 2 seconds anyway
       setTimeout(() => {
         const storedResult = checkResults.get(tabId);
         if (storedResult && storedResult.is_false_positive) {
-          console.log("⏰ Timeout reached - sending blue notification now");
           
           // Use Chrome's native notification API (works on error pages)
           // Send to content script (original working approach)
@@ -416,10 +374,8 @@ async function fastSecurityCheck(url, tabId) {
             },
           })
           .then(() => {
-            console.log("✅ Blue notification sent successfully");
             checkResults.delete(tabId);
           })
-          .catch((err) => console.log("⚠️ Content script not available:", err.message));
         }
       }, 2000);
 
@@ -431,10 +387,6 @@ async function fastSecurityCheck(url, tabId) {
 
     // CHANGED: Block VERY HIGH risk (>80%) with RED, Medium risk (40-80%) with YELLOW
     if (data.final_risk_pct > 80 || data.risk_level === "VERY SUSPICIOUS") {
-      console.log(
-        "🚫 HIGH RISK BLOCKING - Risk:",
-        data.final_risk_pct.toFixed(1) + "%"
-      );
 
       // Redirect to local blocking page (works even if target doesn't exist)
       const urlProb = (data.url_prob * 100).toFixed(1);
@@ -446,14 +398,10 @@ async function fastSecurityCheck(url, tabId) {
         )}&level=high&url_prob=${urlProb}&content_prob=${contentProb}`;
       chrome.tabs.update(tabId, { url: blockUrl });
 
-      chrome.action.setBadgeText({ text: "⛔", tabId });
+      chrome.action.setBadgeText({ text: "", tabId });
       chrome.action.setBadgeBackgroundColor({ color: "#DC2626", tabId });
     } else if (data.final_risk_pct > 40) {
       // MEDIUM risk - show YELLOW warning before page loads
-      console.log(
-        "⚠️ MEDIUM RISK WARNING - Risk:",
-        data.final_risk_pct.toFixed(1) + "%"
-      );
 
       // Redirect to local warning page
       const urlProb = (data.url_prob * 100).toFixed(1);
@@ -465,11 +413,11 @@ async function fastSecurityCheck(url, tabId) {
         )}&level=medium&url_prob=${urlProb}&content_prob=${contentProb}`;
       chrome.tabs.update(tabId, { url: blockUrl });
 
-      chrome.action.setBadgeText({ text: "⚠", tabId });
+      chrome.action.setBadgeText({ text: "", tabId });
       chrome.action.setBadgeBackgroundColor({ color: "#FF9800", tabId });
     } else {
       // Low risk - REMOVE checking overlay and allow page to load
-      chrome.action.setBadgeText({ text: "✓", tabId });
+      chrome.action.setBadgeText({ text: "", tabId });
       chrome.action.setBadgeBackgroundColor({ color: "#10B981", tabId });
 
       // Remove the checking overlay and restore visibility
@@ -486,11 +434,9 @@ async function fastSecurityCheck(url, tabId) {
               }
             },
           })
-          .catch((err) => console.log("Overlay already removed:", err));
       }, 100);
     }
   } catch (error) {
-    console.error("Security check error:", error);
   } finally {
     pendingChecks.delete(tabId);
   }
@@ -501,13 +447,6 @@ function handleResult(tabId, data) {
   const color = data.color || "gray";
   const riskPct = data.final_risk_pct || 0;
 
-  console.log("\n" + "=".repeat(70));
-  console.log("HANDLE RESULT - TabId:", tabId);
-  console.log("Risk Level:", riskLevel);
-  console.log("Risk Pct:", riskPct.toFixed(1) + "%");
-  console.log("Color:", color);
-  console.log("Data:", data);
-  console.log("=".repeat(70) + "\n");
 
   // ========================================================
   // Set badge based on risk level
@@ -516,17 +455,14 @@ function handleResult(tabId, data) {
     // RED - High risk
     chrome.action.setBadgeText({ text: "RISK", tabId: tabId });
     chrome.action.setBadgeBackgroundColor({ color: "#d9534f", tabId: tabId });
-    console.log("🔴 High risk detected - block.html already displayed");
   } else if (riskLevel === "POSSIBLY MALICIOUS" || riskPct > 40) {
     // YELLOW - Medium risk
     chrome.action.setBadgeText({ text: "WARN", tabId: tabId });
     chrome.action.setBadgeBackgroundColor({ color: "#ff9800", tabId: tabId });
-    console.log("🟡 Medium risk detected - block.html already displayed");
   } else {
     // GREEN - Safe
     chrome.action.setBadgeText({ text: "SAFE", tabId: tabId });
     chrome.action.setBadgeBackgroundColor({ color: "#28a745", tabId: tabId });
-    console.log("🟢 Page is SAFE");
 
     // Show small green notification
     showSafeNotification(tabId, data);
@@ -535,14 +471,6 @@ function handleResult(tabId, data) {
 
 function showSafeNotification(tabId, data) {
   try {
-    console.log(
-      "🟢 SHOW_SAFE - Attempting to show GREEN safe notification for tabId:",
-      tabId
-    );
-    console.log("🟢 Message payload:", {
-      action: "SHOW_SAFE",
-      risk_pct: data.final_risk_pct,
-    });
 
     chrome.tabs.sendMessage(
       tabId,
@@ -557,17 +485,11 @@ function showSafeNotification(tabId, data) {
       },
       (response) => {
         if (chrome.runtime.lastError) {
-          console.error(
-            "FAILED to show GREEN notification:",
-            chrome.runtime.lastError.message
-          );
         } else {
-          console.log("GREEN safe notification message sent successfully");
         }
       }
     );
   } catch (err) {
-    console.error("Exception in showSafeNotification:", err);
   }
 }
 
@@ -580,13 +502,11 @@ function showErrorBadge(tabId) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "BYPASS_URL") {
     const url = message.url;
-    console.log("✅ Adding URL to bypass list:", url);
     bypassedUrls.add(url);
 
     // Auto-remove from bypass after 1 minute (safety measure)
     setTimeout(() => {
       bypassedUrls.delete(url);
-      console.log("⏰ Removed URL from bypass list:", url);
     }, 1 * 60 * 1000);
 
     sendResponse({ success: true });
@@ -596,16 +516,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Extension loaded
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("=" * 70);
-  console.log("Rule-Based Phishing Detector Loaded!");
-  console.log("=" * 70);
-  console.log("API Endpoint:", API_ENDPOINT);
-  console.log("Method: Rule-Based Fusion (No Ensemble)");
-  console.log("Whitelist: Enabled");
-  console.log("=" * 70);
 });
 
 // Log when extension starts
-console.log("Extension background script active");
-console.log("Monitoring tabs for phishing...");
 

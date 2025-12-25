@@ -14,7 +14,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 print("\n" + "="*70)
-print(" 🚀 TRAINING MODEL 2024 - WITH DETAILED REPORTING")
+print("  TRAINING MODEL 2024 - WITH DETAILED REPORTING")
 print("="*70)
 
 # Get script directory
@@ -28,19 +28,19 @@ os.makedirs(reports_dir, exist_ok=True)
 # ---------------------------------------------------
 # STEP 1: Load data
 # ---------------------------------------------------
-print("\n📥 Loading data...")
+print("\n Loading data...")
 features_path = os.path.join(base_dir, "feature_extraction", "url_2024", "extracted_features", "extracted_features_2024.pkl")
 labels_path = os.path.join(base_dir, "feature_extraction", "url_2024", "extracted_features", "extracted_labels_2024.pkl")
 
 X = joblib.load(features_path)
 y = joblib.load(labels_path)
-print(f"✅ Features loaded: {X.shape}")
-print(f"✅ Labels loaded: {len(y)}")
+print(f" Features loaded: {X.shape}")
+print(f" Labels loaded: {len(y)}")
 
 # ---------------------------------------------------
 # STEP 2: Validate labels
 # ---------------------------------------------------
-print("\n🔍 Validating labels...")
+print("\n Validating labels...")
 y = pd.Series(y)
 
 # Check label distribution
@@ -55,20 +55,20 @@ for label, count in zip(unique, counts):
 legitimate_count = label_distribution.get('Legitimate', 0)
 phishing_count = label_distribution.get('Phishing', 0)
 imbalance_ratio = legitimate_count / max(1, phishing_count)
-print(f"\n⚖️  Class Imbalance Ratio: {imbalance_ratio:.2f}:1 (Legitimate:Phishing)")
+print(f"\n  Class Imbalance Ratio: {imbalance_ratio:.2f}:1 (Legitimate:Phishing)")
 
 if imbalance_ratio > 2:
-    print(f"   ⚠️  Will use scale_pos_weight={imbalance_ratio:.2f} to handle imbalance")
+    print(f"     Will use scale_pos_weight={imbalance_ratio:.2f} to handle imbalance")
 
 # ---------------------------------------------------
 # STEP 3: Train-test split (stratified)
 # ---------------------------------------------------
-print("\n📊 Splitting data (stratified)...")
+print("\n Splitting data (stratified)...")
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
-print(f"✅ Training set: {X_train.shape[0]} samples")
-print(f"✅ Test set: {X_test.shape[0]} samples")
+print(f" Training set: {X_train.shape[0]} samples")
+print(f" Test set: {X_test.shape[0]} samples")
 
 # Verify stratification
 print(f"\n   Training set distribution:")
@@ -80,7 +80,7 @@ for label, count in train_dist.items():
 # ---------------------------------------------------
 # STEP 4: Hyperparameter optimization
 # ---------------------------------------------------
-print("\n🔍 Starting hyperparameter optimization...")
+print("\n Starting hyperparameter optimization...")
 
 def objective(trial):
     params = {
@@ -111,7 +111,7 @@ study = optuna.create_study(
 
 study.optimize(objective, n_trials=30, show_progress_bar=True, n_jobs=1)
 
-print(f"\n✅ Best CV Accuracy: {study.best_value:.4f}")
+print(f"\n Best CV Accuracy: {study.best_value:.4f}")
 
 # ---------------------------------------------------
 # STEP 5: Train final model
@@ -123,12 +123,12 @@ final_model.fit(
     eval_set=[(X_test, y_test)],
     verbose=False
 )
-print("✅ Model training complete!")
+print(" Model training complete!")
 
 # ---------------------------------------------------
 # STEP 6: Evaluate
 # ---------------------------------------------------
-print("\n📊 Evaluating model...")
+print("\n Evaluating model...")
 
 # Cross-validation
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -146,8 +146,8 @@ train_accuracy = accuracy_score(y_train, y_pred_train)
 # Confusion matrix
 cm = confusion_matrix(y_test, y_pred_test)
 
-print(f"✅ Test Accuracy: {test_accuracy:.4f} ({test_accuracy*100:.2f}%)")
-print(f"✅ Train Accuracy: {train_accuracy:.4f} ({train_accuracy*100:.2f}%)")
+print(f" Test Accuracy: {test_accuracy:.4f} ({test_accuracy*100:.2f}%)")
+print(f" Train Accuracy: {train_accuracy:.4f} ({train_accuracy*100:.2f}%)")
 
 # Calculate detailed metrics
 tn, fp, fn, tp = cm.ravel()
@@ -156,7 +156,7 @@ fnr = fn / (fn + tp) if (fn + tp) > 0 else 0
 precision = tp / (tp + fp) if (tp + fp) > 0 else 0
 recall = tp / (tp + fn) if (tp + fn) > 0 else 0
 
-print(f"\n📊 Test Set Metrics:")
+print(f"\n Test Set Metrics:")
 print(f"   False Positive Rate: {fpr:.4f} ({fpr*100:.2f}%)")
 print(f"   False Negative Rate: {fnr:.4f} ({fnr*100:.2f}%)")
 print(f"   Precision: {precision:.4f} ({precision*100:.2f}%)")
@@ -166,7 +166,7 @@ print(f"   Recall: {recall:.4f} ({recall*100:.2f}%)")
 # STEP 6.5: THRESHOLD OPTIMIZATION (Reduce False Positives)
 # ============================================================
 print("\n" + "="*70)
-print(" 🎯 OPTIMIZING DECISION THRESHOLD")
+print("  OPTIMIZING DECISION THRESHOLD")
 print("="*70)
 
 # Get predicted probabilities
@@ -196,12 +196,12 @@ balanced_threshold = thresholds[balanced_idx] if balanced_idx < len(thresholds) 
 # Choose optimal threshold: Use high-precision for FP reduction
 optimal_threshold = high_precision_threshold
 
-print(f"\n📊 Threshold Analysis:")
+print(f"\n Threshold Analysis:")
 print(f"   Default threshold:        0.5000")
 print(f"   F1-optimized threshold:   {f1_threshold:.4f}")
 print(f"   Balanced threshold:       {balanced_threshold:.4f}")
 print(f"   High-precision threshold: {high_precision_threshold:.4f}")
-print(f"\n   ✅ Selected: {optimal_threshold:.4f} (high-precision)")
+print(f"\n    Selected: {optimal_threshold:.4f} (high-precision)")
 
 # Make predictions with optimal threshold
 y_pred_optimal = (y_proba >= optimal_threshold).astype(int)
@@ -218,7 +218,7 @@ fnr_optimal = fn_opt / (fn_opt + tp_opt) if (fn_opt + tp_opt) > 0 else 0
 precision_optimal = tp_opt / (tp_opt + fp_opt) if (tp_opt + fp_opt) > 0 else 0
 recall_optimal = tp_opt / (tp_opt + fn_opt) if (tp_opt + fn_opt) > 0 else 0
 
-print(f"\n📊 Performance Comparison:")
+print(f"\n Performance Comparison:")
 print(f"{'Metric':<30} {'Default (0.5)':<15} {'Optimal ({:.2f})'.format(optimal_threshold):<15} {'Change':<10}")
 print("-"*70)
 print(f"{'Accuracy':<30} {test_accuracy:.4f} ({test_accuracy*100:.1f}%)  {test_accuracy_optimal:.4f} ({test_accuracy_optimal*100:.1f}%)  {(test_accuracy_optimal-test_accuracy)*100:+.1f}%")
@@ -227,19 +227,19 @@ print(f"{'False Negative Rate':<30} {fnr:.4f} ({fnr*100:.1f}%)  {fnr_optimal:.4f
 print(f"{'Precision':<30} {precision:.4f} ({precision*100:.1f}%)  {precision_optimal:.4f} ({precision_optimal*100:.1f}%)  {(precision_optimal-precision)*100:+.1f}%")  
 print(f"{'Recall':<30} {recall:.4f} ({recall*100:.1f}%)  {recall_optimal:.4f} ({recall_optimal*100:.1f}%)  {(recall_optimal-recall)*100:+.1f}%")
 
-print(f"\n💡 Key Improvement:")
+print(f"\n Key Improvement:")
 if fpr_optimal < fpr:
     fpr_reduction = (fpr - fpr_optimal) * 100
-    print(f"   ✅ False positive rate reduced by {fpr_reduction:.1f} percentage points")
+    print(f"    False positive rate reduced by {fpr_reduction:.1f} percentage points")
     print(f"   This means fewer legitimate sites wrongly flagged as phishing!")
 else:
-    print(f"   ⚠️  No improvement in false positive rate")
+    print(f"     No improvement in false positive rate")
 
 # ============================================================
 # STEP 6.7: COMPLEX URL VALIDATION
 # ============================================================
 print("\n" + "="*70)
-print(" 🔬 VALIDATION: TESTING ON COMPLEX LEGITIMATE URLS")
+print("  VALIDATION: TESTING ON COMPLEX LEGITIMATE URLS")
 print("="*70)
 
 sys.path.append(os.path.join(base_dir, 'feature_extraction', 'url_2024'))
@@ -263,7 +263,7 @@ complex_test_urls = [
     "https://accounts.google.com/o/oauth2/v2/auth",
 ]
 
-print(f"\n📋 Testing {len(complex_test_urls)} complex legitimate URLs...")
+print(f"\n Testing {len(complex_test_urls)} complex legitimate URLs...")
 
 # Extract features
 extractor = URLFeatureExtractor()
@@ -273,7 +273,7 @@ for url in complex_test_urls:
         feats = extractor.extract(url)
         complex_features.append(feats)
     except Exception as e:
-        print(f"⚠️  Error extracting {url}: {e}")
+        print(f"  Error extracting {url}: {e}")
 
 X_complex = pd.DataFrame(complex_features)
 X_complex = X_complex.reindex(columns=X.columns, fill_value=0)
@@ -287,20 +287,20 @@ y_pred_optimal_complex = (y_proba_complex >= optimal_threshold).astype(int)
 fp_default_complex = np.sum(y_pred_default_complex == 1)
 fp_optimal_complex = np.sum(y_pred_optimal_complex == 1)
 
-print(f"\n📊 Results:")
+print(f"\n Results:")
 print(f"   False Positives (default 0.5):  {fp_default_complex}/{len(complex_test_urls)} ({fp_default_complex/len(complex_test_urls)*100:.1f}%)")
 print(f"   False Positives (optimal {optimal_threshold:.2f}): {fp_optimal_complex}/{len(complex_test_urls)} ({fp_optimal_complex/len(complex_test_urls)*100:.1f}%)")
 print(f"   Improvement: {fp_default_complex - fp_optimal_complex} URLs now correctly classified as safe")
 
 # Detailed breakdown
-print(f"\n📋 Detailed Analysis:")
+print(f"\n Detailed Analysis:")
 print(f"{'URL':<60} {'Prob':<8} {'Default':<10} {'Optimal':<10}")
 print("-"*90)
 
 for i, url in enumerate(complex_test_urls):
     prob = y_proba_complex[i]
-    pred_def = "⚠️ PHISH" if y_pred_default_complex[i] == 1 else "✅ Safe"
-    pred_opt = "⚠️ PHISH" if y_pred_optimal_complex[i] == 1 else "✅ Safe"
+    pred_def = " PHISH" if y_pred_default_complex[i] == 1 else " Safe"
+    pred_opt = " PHISH" if y_pred_optimal_complex[i] == 1 else " Safe"
     
     # Truncate URL for display
     url_short = url[:57] + "..." if len(url) > 60 else url
@@ -331,13 +331,13 @@ validation_report = {
 validation_json_path = os.path.join(reports_dir, "complex_url_validation_2024.json")
 with open(validation_json_path, 'w') as f:
     json.dump(validation_report, f, indent=4)
-print(f"\n✅ Saved: complex_url_validation_2024.json")
+print(f"\n Saved: complex_url_validation_2024.json")
 
 # ---------------------------------------------------
 # STEP 7: Generate Detailed Reports
 # ---------------------------------------------------
 print("\n" + "="*70)
-print(" 📝 GENERATING DETAILED REPORTS")
+print("  GENERATING DETAILED REPORTS")
 print("="*70)
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -380,7 +380,7 @@ training_summary = {
 json_path = os.path.join(reports_dir, "training_summary_2024.json")
 with open(json_path, 'w') as f:
     json.dump(training_summary, f, indent=4)
-print(f"✅ Saved: training_summary_2024.json")
+print(f" Saved: training_summary_2024.json")
 
 # ========================================================
 # REPORT 2: Feature Importance (CSV)
@@ -392,7 +392,7 @@ feature_importance = pd.DataFrame({
 
 csv_path = os.path.join(reports_dir, "feature_importance_2024.csv")
 feature_importance.to_csv(csv_path, index=False)
-print(f"✅ Saved: feature_importance_2024.csv")
+print(f" Saved: feature_importance_2024.csv")
 
 # ========================================================
 # REPORT 3: Human-Readable Report (TXT)
@@ -405,7 +405,7 @@ report_lines.append(f"\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 # Dataset Information
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n📊 DATASET INFORMATION")
+report_lines.append("\n DATASET INFORMATION")
 report_lines.append("-"*90)
 report_lines.append(f"Total Samples:          {len(X):,}")
 report_lines.append(f"Training Samples:       {len(X_train):,}")
@@ -417,11 +417,11 @@ report_lines.append(f"  Phishing:             {label_distribution.get('Phishing'
 report_lines.append(f"\nClass Imbalance:")
 report_lines.append(f"  Ratio: {imbalance_ratio:.2f}:1 (Legitimate:Phishing)")
 if imbalance_ratio > 2:
-    report_lines.append(f"  ✅ Handled with scale_pos_weight={imbalance_ratio:.2f}")
+    report_lines.append(f"   Handled with scale_pos_weight={imbalance_ratio:.2f}")
 
 # Model Performance
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n🎯 MODEL PERFORMANCE")
+report_lines.append("\n MODEL PERFORMANCE")
 report_lines.append("-"*90)
 report_lines.append(f"Test Accuracy:          {test_accuracy:.4f} ({test_accuracy*100:.2f}%)")
 report_lines.append(f"Train Accuracy:         {train_accuracy:.4f} ({train_accuracy*100:.2f}%)")
@@ -429,15 +429,15 @@ report_lines.append(f"CV Accuracy:            {cv_scores.mean():.4f} ± {cv_scor
 report_lines.append(f"Overfitting Gap:        {train_accuracy - test_accuracy:.4f}")
 
 if train_accuracy - test_accuracy < 0.02:
-    report_lines.append("  ✅ Excellent - Minimal overfitting")
+    report_lines.append("   Excellent - Minimal overfitting")
 elif train_accuracy - test_accuracy < 0.05:
-    report_lines.append("  ✅ Good - Slight overfitting (acceptable)")
+    report_lines.append("   Good - Slight overfitting (acceptable)")
 else:
-    report_lines.append("  ⚠️  Warning - Moderate overfitting detected")
+    report_lines.append("    Warning - Moderate overfitting detected")
 
 # Detailed Metrics
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n📋 DETAILED METRICS")
+report_lines.append("\n DETAILED METRICS")
 report_lines.append("-"*90)
 report_lines.append(f"False Positive Rate:    {fpr:.4f} ({fpr*100:.2f}%)")
 report_lines.append(f"  → {fp} legitimate URLs wrongly flagged as phishing")
@@ -450,7 +450,7 @@ report_lines.append(f"  → Model catches {recall*100:.1f}% of all phishing URLs
 
 # Confusion Matrix
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n📋 CONFUSION MATRIX")
+report_lines.append("\n CONFUSION MATRIX")
 report_lines.append("-"*90)
 report_lines.append(f"True Negatives (Legit → Legit):      {tn:,}")
 report_lines.append(f"False Positives (Legit → Phishing):  {fp:,}")
@@ -459,7 +459,7 @@ report_lines.append(f"True Positives (Phishing → Phishing): {tp:,}")
 
 # Feature Importance
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n🏆 TOP 20 MOST IMPORTANT FEATURES")
+report_lines.append("\n TOP 20 MOST IMPORTANT FEATURES")
 report_lines.append("-"*90)
 report_lines.append("\nThese features are most important for identifying phishing:")
 for idx, row in feature_importance.head(20).iterrows():
@@ -467,9 +467,9 @@ for idx, row in feature_importance.head(20).iterrows():
 
 # Explanation of Results
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n💡 UNDERSTANDING THE RESULTS")
+report_lines.append("\n UNDERSTANDING THE RESULTS")
 report_lines.append("-"*90)
-report_lines.append("\n❓ Why is phishing percentage different in predictions?")
+report_lines.append("\n Why is phishing percentage different in predictions?")
 report_lines.append(f"   Dataset has {phishing_count} phishing ({phishing_count/len(y)*100:.1f}%)")
 report_lines.append(f"   Model predicted {(y_pred_test == 1).sum()} as phishing in test set")
 report_lines.append(f"   Actual phishing in test: {(y_test == 1).sum()}")
@@ -477,7 +477,7 @@ report_lines.append(f"\n   This difference shows:")
 report_lines.append(f"   • False Positives: Model too aggressive → {fp} safe URLs blocked")
 report_lines.append(f"   • False Negatives: Model too lenient → {fn} phishing URLs missed")
 
-report_lines.append("\n❓ How does the model identify phishing?")
+report_lines.append("\n How does the model identify phishing?")
 report_lines.append(f"   The model learned patterns from {len(X):,} URLs:")
 report_lines.append(f"   • Analyzed 34 URL features (length, characters, structure)")
 report_lines.append(f"   • Most important: {feature_importance.iloc[0]['feature']}")
@@ -486,24 +486,24 @@ report_lines.append(f"   • Balanced classes using scale_pos_weight={imbalance_
 
 # Hyperparameters
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n⚙️  HYPERPARAMETERS")
+report_lines.append("\n  HYPERPARAMETERS")
 report_lines.append("-"*90)
 for param, value in study.best_params.items():
     report_lines.append(f"{param:<25} {value}")
 
 report_lines.append(f"\n{'='*90}")
-report_lines.append("\n✅ TRAINING COMPLETED SUCCESSFULLY")
+report_lines.append("\n TRAINING COMPLETED SUCCESSFULLY")
 report_lines.append("="*90)
 
 txt_path = os.path.join(reports_dir, "training_report_2024.txt")
 with open(txt_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(report_lines))
-print(f"✅ Saved: training_report_2024.txt")
+print(f" Saved: training_report_2024.txt")
 
 # ---------------------------------------------------
 # STEP 8: Save model
 # ---------------------------------------------------
-print("\n💾 Saving model files...")
+print("\n Saving model files...")
 model_dir = os.path.join(base_dir, "models", "model_2024")
 os.makedirs(model_dir, exist_ok=True)
 
@@ -511,20 +511,20 @@ joblib.dump(final_model, os.path.join(model_dir, "model_2024.pkl"))
 joblib.dump(list(X.columns), os.path.join(model_dir, "features_2024.pkl"))
 joblib.dump(training_summary, os.path.join(model_dir, "model_2024_metadata.pkl"))
 
-print("\n✅ All files saved!")
+print("\n All files saved!")
 print(f"   - model_2024.pkl")
 print(f"   - features_2024.pkl")  
 print(f"   - model_2024_metadata.pkl")
 print(f"   - reports/training_summary_2024.json")
 print(f"   - reports/feature_importance_2024.csv")
-print(f"   - reports/training_report_2024.txt ⭐")
+print(f"   - reports/training_report_2024.txt ")
 
 print("\n" + "="*70)
-print(" ✅ TRAINING COMPLETE!")
+print("  TRAINING COMPLETE!")
 print("="*70)
-print(f"\n📖 Read the detailed report:")
+print(f"\n Read the detailed report:")
 print(f"   {txt_path}")
-print(f"\n📊 Model Performance Summary:")
+print(f"\n Model Performance Summary:")
 print(f"   Accuracy: {test_accuracy*100:.2f}%")
 print(f"   Precision: {precision*100:.2f}%")
 print(f"   Recall: {recall*100:.2f}%")

@@ -102,7 +102,7 @@ class RuleBasedFusionPredictor:
         url_pct = url_prob * 100
         content_pct = content_prob * 100
         
-        print(f"\n📊 Input Probabilities:")
+        print(f"\n Input Probabilities:")
         print(f"   Model 2025 (URL):     {url_pct:.1f}%")
         print(f"   Model 2023 (Content): {content_pct:.1f}%")
         print(f"   HTML Available:       {html_available}")
@@ -116,14 +116,14 @@ class RuleBasedFusionPredictor:
         if disagreement > 40:
             # Models DISAGREE → Use 50/50 average
             base_risk = (url_pct + content_pct) / 2
-            print(f"\n🔹 Rule 1 - Disagreement (50/50 Average):")
+            print(f"\n Rule 1 - Disagreement (50/50 Average):")
             print(f"   disagreement = |{url_pct:.1f}% - {content_pct:.1f}%| = {disagreement:.1f}%")
             print(f"   base_risk = ({url_pct:.1f}% + {content_pct:.1f}%) / 2 = {base_risk:.1f}%")
             print(f"   Reason: High disagreement → Equal weight to both models")
         else:
             # Models AGREE → Use MAX
             base_risk = max(url_pct, content_pct)
-            print(f"\n🔹 Rule 1 - Agreement (MAX):")
+            print(f"\n Rule 1 - Agreement (MAX):")
             print(f"   disagreement = {disagreement:.1f}% (< 40% threshold)")
             print(f"   base_risk = MAX({url_pct:.1f}%, {content_pct:.1f}%) = {base_risk:.1f}%")
             print(f"   Reason: Models agree → Take higher risk")
@@ -140,13 +140,13 @@ class RuleBasedFusionPredictor:
         
         if both_say_phishing and agreement > 60:
             boost = agreement * 0.03  # More conservative boost
-            print(f"\n🔹 Rule 2 - Agreement Boost:")
+            print(f"\n Rule 2 - Agreement Boost:")
             print(f"   Both models predict phishing (>{50}%)")
             print(f"   agreement = {agreement:.1f}% (> 60% threshold)")
             print(f"   boost = {agreement:.1f}% × 0.03 = {boost:.1f}%")
             print(f"   Reason: Strong consensus on danger → Amplify signal")
         else:
-            print(f"\n🔹 Rule 2 - Agreement Boost:")
+            print(f"\n Rule 2 - Agreement Boost:")
             if not both_say_phishing:
                 print(f"   Not both predicting phishing → No boost")
             else:
@@ -159,11 +159,11 @@ class RuleBasedFusionPredictor:
         
         if not html_available:
             html_adjustment = 5.0
-            print(f"\n🔹 Rule 3 - HTML Adjustment:")
+            print(f"\n Rule 3 - HTML Adjustment:")
             print(f"   HTML not available → Reduce confidence by {html_adjustment:.1f}%")
             print(f"   Reason: Can't verify content, rely only on URL")
         else:
-            print(f"\n🔹 Rule 3 - HTML Adjustment:")
+            print(f"\n Rule 3 - HTML Adjustment:")
             print(f"   HTML available → No adjustment needed")
         
         # --------------------------------------------------------
@@ -173,7 +173,7 @@ class RuleBasedFusionPredictor:
         final_risk = max(0, min(100, final_risk)) 
         
         print(f"\n" + "="*70)
-        print(" 🎯 FINAL CALCULATION")
+        print("  FINAL CALCULATION")
         print("="*70)
         print(f"\n   final_risk = base + boost - html_adj")
         print(f"   final_risk = {base_risk:.1f} + {boost:.1f} - {html_adjustment:.1f}")
@@ -227,7 +227,7 @@ class RuleBasedFusionPredictor:
         }
 
         print(f"\n" + "="*70)
-        print(f" 🔍 ANALYZING: {url}")
+        print(f"  ANALYZING: {url}")
         print("="*70)
 
         # ========================================================
@@ -313,11 +313,11 @@ class RuleBasedFusionPredictor:
         
         # Create user message
         if risk_level == "VERY SAFE":
-            results['message'] = f"✅ SAFE: {100 - results['final_risk_pct']:.1f}% legitimate confidence"
+            results['message'] = f" SAFE: {100 - results['final_risk_pct']:.1f}% legitimate confidence"
         elif risk_level == "POSSIBLY MALICIOUS":
-            results['message'] = f"⚠️ WARNING: {results['final_risk_pct']:.1f}% risk detected"
+            results['message'] = f" WARNING: {results['final_risk_pct']:.1f}% risk detected"
         else:  # VERY SUSPICIOUS
-            results['message'] = f"⛔ BLOCKED: {results['final_risk_pct']:.1f}% phishing confidence"
+            results['message'] = f" BLOCKED: {results['final_risk_pct']:.1f}% phishing confidence"
 
         # ========================================================
         # Print Final Summary
@@ -331,15 +331,15 @@ class RuleBasedFusionPredictor:
         Print user-friendly warning (what appears in browser extension)
         """
         print(f"\n" + "="*70)
-        print(" 🌐 BROWSER WARNING (What User Sees)")
+        print("  BROWSER WARNING (What User Sees)")
         print("="*70)
         
         if results['risk_level'] == "VERY SAFE":
-            icon = "✅"
+            icon = ""
         elif results['risk_level'] == "POSSIBLY MALICIOUS":
-            icon = "⚠️"
+            icon = ""
         else:
-            icon = "⛔"
+            icon = ""
         
         print(f"\n{icon} Security Warning\n")
         print(f"URL Risk Analysis:")

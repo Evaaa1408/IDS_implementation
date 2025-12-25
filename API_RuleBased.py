@@ -46,13 +46,13 @@ def get_risk_level(probability):
     """Determine risk level based on probability"""
     prob = float(probability.replace('%', '')) if isinstance(probability, str) else probability
     if prob >= 75:
-        return '🔴 High'
+        return ' High'
     elif prob >= 55:
         return '🟠 Medium'
     elif prob >= 40:
         return '🟡 Low'
     else:
-        return '✅ Safe'
+        return ' Safe'
 
 def extract_feature_explanations(url, result):
     """Extract detailed reasons why URL was flagged"""
@@ -147,11 +147,11 @@ def load_false_positive_urls():
         _fp_cache['urls'] = fp_urls
         _fp_cache['mtime'] = current_mtime
         
-        print(f"✅ Loaded {len(fp_urls)} verified false positive URLs (cache updated)")
+        print(f" Loaded {len(fp_urls)} verified false positive URLs (cache updated)")
         return fp_urls
         
     except Exception as e:
-        print(f"⚠️ Error loading false positive URLs: {e}")
+        print(f" Error loading false positive URLs: {e}")
         return set()
 
 def log_to_csv(url, result):
@@ -313,7 +313,7 @@ def predict():
         }
         
         # Log response
-        print(f"\n📤 API RESPONSE")
+        print(f"\n API RESPONSE")
         print(f"{'='*70}")
         print(f"Risk Level: {response['risk_level']}")
         print(f"Final Risk: {response['final_risk_pct']:.1f}%")

@@ -33,3 +33,5 @@ timestamp,url,domain,prediction,probability,action,risk_level,reason,detailed_re
 • Overall risk probability: 45.0%"
 2025-12-26 04:23:37,http://23.235.162.74:555/Linux,23.235.162.74,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
 • Overall risk probability: 45.0%"
+2025-12-26 05:12:44,http://tipisvxjack.atspace.cc/login.php,atspace.cc,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"

@@ -509,7 +509,7 @@ if __name__ == "__main__":
         ("https://xzqkrptl.tk", "Phishing (random)"),
     ]
     
-    print("\n🔍 Feature Analysis:")
+    print("\n Feature Analysis:")
     print("-"*90)
     
     for url, desc in test_urls:

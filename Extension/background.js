@@ -517,6 +517,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // Extension loaded
 chrome.runtime.onInstalled.addListener(() => {
 });
-
-// Log when extension starts
-

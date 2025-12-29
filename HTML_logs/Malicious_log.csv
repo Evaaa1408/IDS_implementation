@@ -35,3 +35,53 @@ timestamp,url,domain,prediction,probability,action,risk_level,reason,detailed_re
 • Overall risk probability: 45.0%"
 2025-12-26 05:12:44,http://tipisvxjack.atspace.cc/login.php,atspace.cc,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
 • Overall risk probability: 45.0%"
+2025-12-26 22:53:42,https://login.microsoftonline.com/0fed03a3-402d-4633-a8cd-8b308822253e/oauth2/v2.0/authorize?client_id=e96b418c-3f97-4b0f-b124-1cb3b347a06e&response_type=code&redirect_uri=https%3A%2F%2Fauth.apu.edu.my%2Fauth_token&scope=Group.Read.All+GroupMember.Read.All+User.Read+offline_access+openid+profile&state=%7B%22origin%22%3A+%22https%3A%2F%2Fapspace.apu.edu.my%22%2C+%22endpoint%22%3A+%22%2Flogin%22%2C+%22app_id%22%3A+%22apspace%22%7D&sso_reload=true,microsoftonline.com,Phishing,40.18%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 40.2%"
+2025-12-26 23:26:19,https://en.wikipedia.org/wiki/Main_Page,wikipedia.org,Phishing,38.28%,Warned, Safe,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 38.3%"
+2025-12-26 23:29:32,http://www.w3.org/2000/svg,w3.org,Phishing,44.89%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 44.9%"
+2025-12-26 23:30:12,https://www.google.com/search?q=moodle+apu&oq=moo&gs_lcrp=EgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTIPCAEQABhDGLEDGIAEGIoFMgYIAhBFGEAyBggDEEUYOTIYCAQQLhhDGIMBGMcBGLEDGNEDGIAEGIoFMg8IBRAAGEMYsQMYgAQYigUyDAgGEAAYQxiABBiKBTIMCAcQABhDGIAEGIoF0gEHNjEwajBqN6gCCLACAfEFzdOBe5y6OnU&sourceid=chrome&ie=UTF-8,google.com,Phishing,58.60%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 58.6%"
+2025-12-26 23:31:12,https://www.google.com/search?q=metasploit&oq=&gs_lcrp=EgZjaHJvbWUqCQgFECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoCMgkIBxAjGCcY6gLSAQk1OTIzOGowajeoAgiwAgHxBdp9dtjbMsGw8QXafXbY2zLBsA&sourceid=chrome&ie=UTF-8,google.com,Phishing,71.95%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 72.0%"
+2025-12-26 23:31:19,https://www.google.com/search?q=metasploit&oq=&gs_lcrp=EgZjaHJvbWUqCQgFECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoCMgkIBxAjGCcY6gLSAQk1OTIzOGowajeoAgiwAgHxBdp9dtjbMsGw8QXafXbY2zLBsA&sourceid=chrome&ie=UTF-8,google.com,Phishing,71.95%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 72.0%"
+2025-12-26 23:31:25,https://www.google.com/search?q=metasploit&oq=&gs_lcrp=EgZjaHJvbWUqCQgFECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoCMgkIBxAjGCcY6gLSAQk1OTIzOGowajeoAgiwAgHxBdp9dtjbMsGw8QXafXbY2zLBsA&sourceid=chrome&ie=UTF-8,google.com,Phishing,73.52%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 73.5%"
+2025-12-26 23:31:34,https://www.google.com/search?q=metasploit&oq=&gs_lcrp=EgZjaHJvbWUqCQgBECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoCMgkIBxAjGCcY6gLSAQk4MTc4MGowajeoAgiwAgHxBfwA-od7alMd&sourceid=chrome&ie=UTF-8,google.com,Phishing,73.52%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 73.5%"
+2025-12-26 23:31:41,https://www.rapid7.com/products/metasploit/,rapid7.com,Phishing,28.60%,Warned, Safe,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 28.6%"
+2025-12-26 23:31:45,https://www.google.com/search?q=metasploit&oq=&gs_lcrp=EgZjaHJvbWUqCQgBECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoCMgkIBxAjGCcY6gLSAQk4MTc4MGowajeoAgiwAgHxBfwA-od7alMd&sourceid=chrome&ie=UTF-8,google.com,Phishing,71.95%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 72.0%"
+2025-12-26 23:34:24,http://nopeatech.hu/wp-content/themes/webstat/kundencenter_mobilfunk,nopeatech.hu,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-26 23:43:03,https://www.google.com/search?q=moodle+apu&oq=mood&gs_lcrp=EgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTIPCAEQRRg5GIMBGLEDGIAEMgYIAhBFGEAyDAgDEAAYQxiABBiKBTIMCAQQABhDGIAEGIoFMgwIBRAAGEMYgAQYigUyDQgGEAAYsQMYgAQYigUyDQgHEC4YxwEY0QMYgATSAQc4MDRqMGo3qAIIsAIB8QULmvtKclj6Iw&sourceid=chrome&ie=UTF-8,google.com,Phishing,61.42%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 61.4%"
+2025-12-26 23:43:09,https://www.google.com/search?q=apspace&oq=ap&gs_lcrp=EgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTIQCAEQLhjHARixAxjRAxiABDIGCAIQRRhAMgYIAxBFGDkyDAgEEAAYQxiABBiKBTIGCAUQRRg8MgYIBhBFGDwyBggHEEUYPNIBBzQ4N2owajeoAgiwAgHxBV_P_mnOXQQ_&sourceid=chrome&ie=UTF-8,google.com,Phishing,61.31%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 61.3%"
+2025-12-26 23:43:42,https://apspace.apu.edu.my/login?code=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2RlX2lkIjoiOWRjYmU0ZDQtZTI3MS0xMWYwLTk4M2UtN2Y5YjMxMTc2ZmVmIiwiYXBwX2lkIjoiYXBzcGFjZSIsImV4cCI6MTc2Njc2Mzg2NX0.w0ZLg-a4lj_-wk0OpBbJXryUodiI95AxQgWN0h3Iivk&returnTo=%2Flogin,apu.edu.my,Phishing,66.80%,Warned,🟠 Medium,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 66.8%"
+2025-12-26 23:43:58,https://www.google.com/search?q=wikipedia&oq=&gs_lcrp=EgZjaHJvbWUqCQgFECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoC0gEJNDkxMTlqMGo3qAIHsAIB8QWq5ZVlZGC6PQ&sourceid=chrome&ie=UTF-8,google.com,Phishing,61.45%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 61.4%"
+2025-12-26 23:44:00,https://www.wikipedia.org/,wikipedia.org,Phishing,38.49%,Warned, Safe,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 38.5%"
+2025-12-26 23:44:25,https://www.google.com/search?q=%22https%3A%2F%2Fwww.ca.news.yahoo.com%2Fblogs%2Fdaily-buzz%2Fmontreal-lionel-groulx-station-most-romantic-canada-191650481.html&oq=&gs_lcrp=EgZjaHJvbWUqCQgHECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoCMgkIBxAjGCcY6gLSAQkxNDA1MGowajeoAgiwAgHxBaBQ9VBu45dg&sourceid=chrome&ie=UTF-8,google.com,Phishing,60.63%,Warned,🟠 Medium,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 60.6%"
+2025-12-26 23:45:06,https://accounts.google.com/gsi/confirm?client_id=348104539542-743ibtl8hdd5h0k3hqcakt03cmvcoplv.apps.googleusercontent.com&origin=https://www.freemalaysiatoday.com&user_id=115007248353780281909&context=signin&as=XoPKdTbGuVcdxBl9eKxEucDhJ_p2KYr9w3YzHKSOvso,google.com,Phishing,44.38%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 44.4%"
+2025-12-26 23:45:26,https://www.google.com/search?q=news+malaysia&oq=&gs_lcrp=EgZjaHJvbWUqCQgGECMYJxjqAjIJCAAQIxgnGOoCMgkIARAjGCcY6gIyCQgCECMYJxjqAjIJCAMQIxgnGOoCMgkIBBAjGCcY6gIyCQgFECMYJxjqAjIJCAYQIxgnGOoCMgkIBxAjGCcY6gLSAQk0NDY3MWowajeoAgiwAgHxBbR_vZtcDOda&sourceid=chrome&ie=UTF-8,google.com,Phishing,59.57%,Warned,🟠 Medium,Suspicious content," • Suspicious page content detected
+• Overall risk probability: 59.6%"
+2025-12-27 00:10:53,https://theedgemalaysia.com/node/787283,theedgemalaysia.com,Phishing,44.43%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 44.4%"
+2025-12-27 02:21:07,http://www.bavaria-wein.de/HJghjb54,bavaria-wein.de,Phishing,44.99%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-27 02:35:19,http://sellercentral.amazon.de.ho2fi3pe4wo5ba1laisckuz8az6nwq.australianstrongmanalliance.com.au/?Oll6u2fVdjVLyqSIAsSzW7cggljCiilLxNzSR7OB5w1nL,australianstrongmanalliance.com.au,Phishing,44.74%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 44.7%"
+2025-12-28 22:52:15,http://66.196.61.218/img2212.png,66.196.61.218,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-28 22:55:14,http://66.196.61.218/img2212.png,66.196.61.218,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"
+2025-12-29 03:15:37,http://66.196.61.218/img2212.png,66.196.61.218,Phishing,45.00%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 45.0%"

@@ -145,30 +145,34 @@ metadata = {
     "feature_stats_head": summary_stats.head(15).to_dict(orient="index")
 }
 
-os.makedirs("Models/2023", exist_ok=True)
-joblib.dump(metadata, "Models/2023/model_2023_metadata.pkl")
+os.makedirs("Models/model_2023", exist_ok=True)
+joblib.dump(metadata, "Models/model_2023/model_2023_metadata.pkl")
 
-print("\n Metadata saved to: Models/2023/model_2023_metadata.pkl")
+print("\n Metadata saved to: Models/model_2023/model_2023_metadata.pkl")
 print("="*70)
 
 # ---------------------------------------------------
 # STEP 6: Save Model & Artifacts
 # ---------------------------------------------------
 print("\n Saving model...")
-os.makedirs("Models/2023", exist_ok=True)
+os.makedirs("Models/model_2023", exist_ok=True)
 
-joblib.dump(rf, "Models/2023/model_2023.pkl")
-joblib.dump(content_features, "Models/2023/features_2023.pkl")
+joblib.dump(rf, "Models/model_2023/model_2023.pkl")
+joblib.dump(content_features, "Models/model_2023/features_2023.pkl")
 
-print(" Model saved to Models/2023/model_2023.pkl")
-print(" Features saved to Models/2023/features_2023.pkl")
+print(" Model saved to Models/model_2023/model_2023.pkl")
+print(" Features saved to Models/model_2023/features_2023.pkl")
 
 # ---------------------------------------------------
 # STEP 7: Generate Human-Readable Report
 # ---------------------------------------------------
 print("\n Generating human-readable report...")
 
-report_path = "Models/2023/model_2023_report.txt"
+# Create reports directory
+reports_dir = "Models/model_2023/reports"
+os.makedirs(reports_dir, exist_ok=True)
+
+report_path = os.path.join(reports_dir, "training_report_2023.txt")
 
 with open(report_path, 'w', encoding='utf-8') as f:
     f.write("="*70 + "\n")
@@ -287,7 +291,7 @@ print("="*70)
 
 # Load and verify model PKL
 print("\n Model PKL Contents:")
-loaded_model = joblib.load("Models/2023/model_2023.pkl")
+loaded_model = joblib.load("Models/model_2023/model_2023.pkl")
 print(f"   Model Type: {type(loaded_model).__name__}")
 print(f"   Number of Estimators: {loaded_model.n_estimators}")
 print(f"   Max Depth: {loaded_model.max_depth}")
@@ -295,13 +299,13 @@ print(f"   Number of Features: {loaded_model.n_features_in_}")
 
 # Load and verify features PKL
 print("\n Features PKL Contents:")
-loaded_features = joblib.load("Models/2023/features_2023.pkl")
+loaded_features = joblib.load("Models/model_2023/features_2023.pkl")
 print(f"   Number of Features: {len(loaded_features)}")
 print(f"   Features List: {loaded_features[:5]}... (showing first 5)")
 
 # Load and verify metadata PKL
 print("\n Metadata PKL Contents:")
-loaded_metadata = joblib.load("Models/2023/model_2023_metadata.pkl")
+loaded_metadata = joblib.load("Models/model_2023/model_2023_metadata.pkl")
 print(f"   Total Samples: {loaded_metadata['total_samples']}")
 print(f"   Number of Features: {loaded_metadata['num_features']}")
 print(f"   Class Distribution: {loaded_metadata['class_distribution']}")

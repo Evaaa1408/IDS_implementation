@@ -107,3 +107,5 @@ timestamp,url,domain,prediction,probability,action,risk_level,reason,detailed_re
 • Overall risk probability: 42.7%"
 2026-01-04 23:03:35,https://sites.google.com/site/recovaryproblem1/,google.com,Phishing,42.74%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
 • Overall risk probability: 42.7%"
+2026-01-04 23:49:09,https://aokirou.com/login/client/l_home_p.php,aokirou.com,Phishing,41.33%,Warned,🟡 Low,Suspicious URL pattern," • No readable slug detected
+• Overall risk probability: 41.3%"

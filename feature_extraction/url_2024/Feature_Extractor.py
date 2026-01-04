@@ -97,15 +97,8 @@ class URLFeatureExtractor:
         
         return raw_entropy / max_entropy
 
-    # ============================================================
-    # OPTIMIZATION: Compute domain statistics once
-    # ============================================================
+    # Compute domain statistics once
     def compute_domain_statistics(self, domain):
-        """
-        Compute domain characteristics once for reuse.
-        
-        Returns: dict with statistical metrics
-        """
         if not domain:
             return {
                 'vowel_ratio': 0.0,
@@ -143,10 +136,7 @@ class URLFeatureExtractor:
     def detect_slug_pattern(self, path):
         """
         Detect human-readable URL slugs.
-        
-        Pattern: /word-word-word/ or /word_word_word/
-        
-        Returns: 1 if slug detected, 0 otherwise
+        Pattern: /word-word-word, Returns: 1 if slug detected, 0 otherwise
         """
         if not path or len(path) < 5:
             return 0
@@ -162,24 +152,19 @@ class URLFeatureExtractor:
         
         return 0
 
-    # ============================================================
-    # OPTIMIZED: Brand-agnostic typosquatting (uses precomputed stats)
-    # ============================================================
+    # Brand-agnostic typosquatting (uses precomputed stats)
     def compute_typosquatting_score(self, domain, domain_stats):
         """
         Detect typosquatting patterns WITHOUT comparing to known brands.
-        
         Args:
             domain: domain name string
             domain_stats: precomputed statistics from compute_domain_statistics()
-        
         Detects:
             1. Excessive repeated characters (gooogle, faceboook)
             2. Letter-number substitutions (paypa1, g00gle)
             3. Low vowel ratio (random-looking domains)
             4. Unusual character frequency (many 'x', 'q', 'z')
             5. Mixed case in domain (PhIsHiNg.com)
-        
         Returns: float score 0-10 (higher = more suspicious)
         """
         if not domain or len(domain) < 3:
@@ -187,9 +172,7 @@ class URLFeatureExtractor:
         
         score = 0.0
         
-        # ============================================================
         # SIGNAL 1: Excessive repeated characters
-        # ============================================================
         prev_char = ''
         max_repeat = 0
         current_repeat = 1
@@ -206,9 +189,7 @@ class URLFeatureExtractor:
         if max_repeat >= 3:
             score += min(2.0, (max_repeat - 2) * 0.5)
         
-        # ============================================================
         # SIGNAL 2: Letter-number substitutions
-        # ============================================================
         substitution_patterns = [
             ('0', 'o'), ('1', 'i'), ('1', 'l'), ('3', 'e'),
             ('4', 'a'), ('5', 's'), ('7', 't'), ('8', 'b')
@@ -223,9 +204,7 @@ class URLFeatureExtractor:
         if has_substitution:
             score += 1.5
         
-        # ============================================================
         # SIGNAL 3: Low vowel ratio (OPTIMIZED - uses precomputed)
-        # ============================================================
         vowel_ratio = domain_stats['vowel_ratio']
         
         if vowel_ratio < 0.15:
@@ -233,22 +212,16 @@ class URLFeatureExtractor:
         elif vowel_ratio < 0.25:
             score += 1.0
         
-        # ============================================================
         # SIGNAL 4: Unusual character frequency (OPTIMIZED - uses precomputed)
-        # ============================================================
         if domain_stats['unusual_char_ratio'] > 0.15:
             score += 1.5
         
-        # ============================================================
         # SIGNAL 5: Character diversity (OPTIMIZED - uses precomputed)
-        # ============================================================
         if len(domain_stats['alpha_chars']) > 4:
             if domain_stats['unique_ratio'] < 0.4:
                 score += 1.0
         
-        # ============================================================
         # SIGNAL 6: Homograph character detection
-        # ============================================================
         homograph_count = sum(1 for c in domain if c in self.homographs.values())
         if homograph_count > 0:
             score += min(3.0, homograph_count * 1.5)
@@ -258,11 +231,9 @@ class URLFeatureExtractor:
     def detect_known_typosquatting_patterns(self, domain):
         """
         Detect GENERIC typosquatting patterns (NOT brand-specific).
-        
         Patterns:
             - Common misspelling patterns (double letters where uncommon)
             - Random capitalization (typing errors)
-        
         Returns: 1 if suspicious pattern, 0 otherwise
         """
         if not domain or len(domain) < 4:
@@ -322,7 +293,7 @@ class URLFeatureExtractor:
         return min(3, score)
 
     # ============================================================
-    # MAIN EXTRACTION METHOD (OPTIMIZED)
+    # MAIN EXTRACTION METHOD
     # ============================================================
     def extract(self, url):
         """Extract features from URL with false positive fixes"""
@@ -342,14 +313,10 @@ class URLFeatureExtractor:
         domain_with_tld = f"{domain_name}.{tld}" if tld else domain_name
         full_domain = hostname
 
-        # ============================================================
-        # OPTIMIZATION: Compute domain statistics once
-        # ============================================================
+        # Compute domain statistics once
         domain_stats = self.compute_domain_statistics(domain_name)
 
-        # ============================================================
         # BASIC FEATURES (23) - WITH CAPPING
-        # ============================================================
         url_length = len(url)
         hostname_length = len(hostname)
         path_length = min(len(path), 120)

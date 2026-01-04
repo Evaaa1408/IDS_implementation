@@ -1,8 +1,8 @@
 ======================================================================
- 🚀 MODEL 2023 TRAINING REPORT
+  MODEL 2023 TRAINING REPORT
 ======================================================================
 
-📋 MODEL CONFIGURATION
+ MODEL CONFIGURATION
 ----------------------------------------------------------------------
 Model Type:           Random Forest Classifier
 Number of Trees:      600
@@ -15,7 +15,7 @@ Bootstrap:            True
 OOB Score Enabled:    True
 
 ======================================================================
-📊 DATASET INFORMATION
+ DATASET INFORMATION
 ======================================================================
 Total Samples:        235370
 Number of Features:   28
@@ -27,7 +27,7 @@ Class Distribution:
   Phishing (1):       134850 (57.29%)
 
 ======================================================================
-🎯 MODEL PERFORMANCE
+ MODEL PERFORMANCE
 ======================================================================
 Training Accuracy:    0.9995 (99.95%)
 Testing Accuracy:     0.9979 (99.79%)
@@ -35,7 +35,7 @@ OOB Score:            0.9978 (99.78%)
 Overfitting Gap:      0.0016
 
 ======================================================================
-📈 DETAILED CLASSIFICATION REPORT (TEST SET)
+ DETAILED CLASSIFICATION REPORT (TEST SET)
 ======================================================================
 
 Class 0 (Legitimate):
@@ -51,19 +51,19 @@ Class 1 (Phishing):
   Support:      26970
 
 ======================================================================
-🔍 CONFUSION MATRIX ANALYSIS
+ CONFUSION MATRIX ANALYSIS
 ======================================================================
 True Negatives (TN):   20038 (Correctly identified legitimate)
 False Positives (FP):  66 (Legitimate marked as phishing)
 False Negatives (FN):  34 (Phishing marked as legitimate)
 True Positives (TP):   26936 (Correctly identified phishing)
 
-⚠️ ERROR ANALYSIS:
+ ERROR ANALYSIS:
 False Positive Rate:   0.33%
 False Negative Rate:   0.13%
 
 ======================================================================
-🏆 FEATURE IMPORTANCE (ALL FEATURES)
+ FEATURE IMPORTANCE (ALL FEATURES)
 ======================================================================
 NoOfExternalRef                     0.200232
 NoOfSelfRef                         0.177751
@@ -95,7 +95,7 @@ HasExternalFormSubmit               0.000077
 NoOfSelfRedirect                    0.000036
 
 ======================================================================
-📊 FEATURE STATISTICS SUMMARY
+ FEATURE STATISTICS SUMMARY
 ======================================================================
 
 
@@ -160,7 +160,7 @@ NoOfSelfRedirect:
   Max:      1.0000
 
 ======================================================================
-💡 MODEL INTERPRETATION & INSIGHTS
+ MODEL INTERPRETATION & INSIGHTS
 ======================================================================
 
 Top 5 Most Important Features:

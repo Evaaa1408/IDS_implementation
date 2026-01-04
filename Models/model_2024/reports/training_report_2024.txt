@@ -6,7 +6,7 @@ Generated: 2025-12-19 05:15:45
 
 ==========================================================================================
 
-📊 DATASET INFORMATION
+ DATASET INFORMATION
 ------------------------------------------------------------------------------------------
 Total Samples:          450,176
 Training Samples:       360,140
@@ -19,21 +19,21 @@ Label Distribution:
 
 Class Imbalance:
   Ratio: 3.31:1 (Legitimate:Phishing)
-  ✅ Handled with scale_pos_weight=3.31
+   Handled with scale_pos_weight=3.31
 
 ==========================================================================================
 
-🎯 MODEL PERFORMANCE
+ MODEL PERFORMANCE
 ------------------------------------------------------------------------------------------
 Test Accuracy:          0.9953 (99.53%)
 Train Accuracy:         0.9967 (99.67%)
 CV Accuracy:            0.9957 ± 0.0003
 Overfitting Gap:        0.0014
-  ✅ Excellent - Minimal overfitting
+   Excellent - Minimal overfitting
 
 ==========================================================================================
 
-📋 DETAILED METRICS
+ DETAILED METRICS
 ------------------------------------------------------------------------------------------
 False Positive Rate:    0.0006 (0.06%)
   → 43 legitimate URLs wrongly flagged as phishing
@@ -46,7 +46,7 @@ Recall:                 0.9819 (98.19%)
 
 ==========================================================================================
 
-📋 CONFUSION MATRIX
+ CONFUSION MATRIX
 ------------------------------------------------------------------------------------------
 True Negatives (Legit → Legit):      69,105
 False Positives (Legit → Phishing):  43
@@ -55,7 +55,7 @@ True Positives (Phishing → Phishing): 20,510
 
 ==========================================================================================
 
-🏆 TOP 20 MOST IMPORTANT FEATURES
+ TOP 20 MOST IMPORTANT FEATURES
 ------------------------------------------------------------------------------------------
 
 These features are most important for identifying phishing:
@@ -82,10 +82,10 @@ contains_ip                    0.001073
 
 ==========================================================================================
 
-💡 UNDERSTANDING THE RESULTS
+ UNDERSTANDING THE RESULTS
 ------------------------------------------------------------------------------------------
 
-❓ Why is phishing percentage different in predictions?
+ Why is phishing percentage different in predictions?
    Dataset has 104438 phishing (23.2%)
    Model predicted 20553 as phishing in test set
    Actual phishing in test: 20888
@@ -94,7 +94,7 @@ contains_ip                    0.001073
    • False Positives: Model too aggressive → 43 safe URLs blocked
    • False Negatives: Model too lenient → 378 phishing URLs missed
 
-❓ How does the model identify phishing?
+ How does the model identify phishing?
    The model learned patterns from 450,176 URLs:
    • Analyzed 34 URL features (length, characters, structure)
    • Most important: uses_https
@@ -103,7 +103,7 @@ contains_ip                    0.001073
 
 ==========================================================================================
 
-⚙️  HYPERPARAMETERS
+  HYPERPARAMETERS
 ------------------------------------------------------------------------------------------
 max_depth                 8
 reg_lambda                1.1458246214273435
@@ -116,5 +116,5 @@ n_estimators              257
 
 ==========================================================================================
 
-✅ TRAINING COMPLETED SUCCESSFULLY
+ TRAINING COMPLETED SUCCESSFULLY
 ==========================================================================================

@@ -221,7 +221,7 @@ def log_to_csv(url, result):
 def home():
     return jsonify({
         "status": "running", 
-        "model": "Rule-Based Fusion (Model 2023 + Model 2025)",
+        "model": "Rule-Based Fusion (Model 2023 + Model 2024)",
         "framework": "Flask",
         "method": "No Ensemble Training - Pure Logic Rules"
     })
